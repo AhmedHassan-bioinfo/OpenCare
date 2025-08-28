@@ -65,32 +65,38 @@ Docker
 Access to relevant reference data (e.g., GRCh38, GTF, gnomAD, ClinVar)
 
 ## Setup
-git clone https://github.com/<your-org>/opencare.git
+git clone https://github.com/AhmedHassan-bioinfo/OpenCare
 cd opencare
 
-## Usage
-Whole-Genome Sequencing (WGS) Tumor/Normal Analysis
+## Usage (works for any sample)
+
+> **Tip:** Nextflow groups read pairs by the shared prefix before `{1,2}` (or `_R{1,2}`), so keep your files named like `SAMPLE_1.fastq.gz` / `SAMPLE_2.fastq.gz` or `SAMPLE_R1.fastq.gz` / `SAMPLE_R2.fastq.gz`.
+
+### Whole-Genome Sequencing (Tumor/Normal)
+
+**Single sample (replace placeholders):**
+```bash
 nextflow run workflows/main.nf \
-  --reads 'data/wgs/tumor/ERR194146_{1,2}.fastq.gz' \
-  --normal 'data/wgs/normal/ERR194147_{1,2}.fastq.gz' \
-  --ref_fa references/hg38.fa \
-  --sample P001 \
-  --outdir results/P001 \
+  --reads   'data/wgs/tumor/<TUMOR_ID>_{1,2}.fastq.gz' \
+  --normal  'data/wgs/normal/<NORMAL_ID>_{1,2}.fastq.gz' \
+  --ref_fa  references/hg38.fa \
+  --sample  <CASE_ID> \
+  --outdir  results/<CASE_ID> \
   -profile docker
 
 Pharmacogenomics (PGx) Panel
 nextflow run workflows/main.nf \
-  --vcf data/pgx/sample.vcf.gz \
+  --vcf 'data/pgx/<SAMPLE_ID>.vcf.gz' \
   --pgx true \
   --outdir results/pgx_case \
   -profile docker
 
 Infectious Disease (Pathogen Resistance)
 nextflow run workflows/main.nf \
-  --reads 'data/microbes/Ecoli_{1,2}.fastq.gz' \
-  --ref_fa references/ecoli.fa \
-  --id_resistance true \
-  --outdir results/ecoli_case \
+  --reads 'data/microbes/<SAMPLE_ID>_{1,2}.fastq.gz' \
+  --ref_fa references/<SPECIES>.fa \
+  --sample  <SAMPLE_ID> \
+  --outdir  results/microbes/<SAMPLE_ID> \
   -profile docker
 
 ## Outputs
