@@ -75,7 +75,7 @@ cd opencare
 ### Whole-Genome Sequencing (Tumor/Normal)
 
 **Single sample (replace placeholders):**
-```bash
+
 nextflow run workflows/main.nf \
   --reads   'data/wgs/tumor/<TUMOR_ID>_{1,2}.fastq.gz' \
   --normal  'data/wgs/normal/<NORMAL_ID>_{1,2}.fastq.gz' \
