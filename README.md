@@ -36,6 +36,16 @@ Configurable thresholds for variant calling, local drug availability, and report
 ## Workflow
 ![Workflow Diagram](assets/OpenCare%20Workflow%20diagram.jpg)
 
+## Demo Video
+▶️ Watch the demo here: [Demo Video on YouTube](https://youtu.be/ubciuaTrkik)
+
+<p align="center">
+  <a href="https://youtu.be/your-demo-link">
+    <img src="assets/demo_preview.png" alt="Demo Preview" width="600"/>
+  </a>
+</p>
+
+
 ## Reproducibility
 
 Built on Nextflow DSL2 for portability and scalability.
