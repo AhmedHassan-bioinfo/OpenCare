@@ -1,0 +1,1465 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>OpenCARE · Pipeline Reports — PRO v3.2</title>
+<style>
+:root{--brand:#146c74;--brand-strong:#0e4e54;--accent:#0d8ea0;--bg:#ffffff;--fg:#0f172a;--muted:#475569;--card:#fff;--border:#e5e7eb;--th:#f3f4f6;--hover:#f9fafb;--zebra:#fafafa;--ok:#0fb98a;--warn:#f59e0b;--danger:#ef4444;--chip:#e6f7fb;--chipfg:#064e57;--shadow:0 10px 24px rgba(0,0,0,.06)}
+[data-theme="dark"]{--brand:#0b3f44;--brand-strong:#072a2e;--accent:#46c2cf;--bg:#081217;--fg:#e5f6f8;--muted:#97c2c8;--card:#0c1b20;--border:#13353a;--th:#0f2429;--hover:#0c1f24;--zebra:#0a191e;--chip:#0e2b31;--chipfg:#c8f0f4;--shadow:0 12px 28px rgba(0,0,0,.4)}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--fg)}a{color:var(--accent)}:focus-visible{outline:3px solid color-mix(in oklab,var(--accent) 60%,transparent);outline-offset:2px;border-radius:6px}
+.appbar{position:sticky;top:0;z-index:60;background:linear-gradient(90deg,var(--brand),var(--brand-strong));color:#fff;padding:8px 14px;display:flex;gap:16px;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px}
+/* Make logo pop on the dark appbar in Light mode */
+.brand img{
+  height:28px;
+  display:block;
+  /* darker shadow + mild brightness/contrast boost */
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.55)) brightness(1.2) contrast(1.35) saturate(1.08);
+}
+
+/* Keep dark-mode boost but use a dark shadow there too */
+[data-theme="dark"] .brand img{
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.85)) brightness(1.25) contrast(1.25);
+}
+[data-theme="dark"] .brand img{filter:drop-shadow(0 1px 0 rgba(0,0,0,.9)) brightness(1.25) contrast(1.2)}
+.brand .name{font-weight:900;letter-spacing:.2px;font-size:14px}
+/* Appbar AI control */
+.ai-ctl{display:flex;align-items:center;gap:8px;margin-left:10px;padding:2px 6px;
+  border:1px solid rgba(255,255,255,.28);border-radius:12px}
+.ai-label{font-size:12px;opacity:.9;color:#fff}
+/* Segmented control (generic, not just appbar) */
+.seg{
+  display:flex; gap:0; border:1px solid var(--border);
+  background:var(--card); border-radius:12px; overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.seg button{
+  border:0; background:transparent; padding:8px 14px;
+  color:var(--fg); cursor:pointer; opacity:.9;
+}
+.seg button + button{ border-left:1px solid var(--border); }
+.seg button.active{ background:var(--accent); color:#fff; opacity:1; }
+
+/* Pathway chips: animated + active/pressed */
+#pathwayChips .chip{
+  transition: background .12s ease, color .12s ease, transform .05s ease, box-shadow .12s ease;
+}
+#pathwayChips .chip:active{ transform: translateY(1px); }
+#pathwayChips .chip.active{
+  background:var(--accent); color:#fff; border-color:transparent;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.12);
+}
+#pathwayChips .chip .count{
+  margin-left:8px; font-weight:800; opacity:.9;
+  padding:2px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.35);
+}
+[data-theme="light"] #pathwayChips .chip .count{ background:rgba(255,255,255,.35); }
+[data-theme="dark"]  #pathwayChips .chip .count{ background:rgba(0,0,0,.25); }
+
+.appbar .ai-switch{
+  width:46px;height:24px;border-radius:999px;border:0;cursor:pointer;outline:0;
+  background:rgba(255,255,255,.25);
+  box-shadow:inset 0 1px 1px rgba(0,0,0,.15);
+}
+.appbar .ai-switch::after{
+  content:"";position:absolute; width:20px;height:20px;border-radius:50%;
+  background:#fff;top:2px;left:2px;box-shadow:0 1px 2px rgba(0,0,0,.25);
+  transition:transform .18s cubic-bezier(.2,.8,.2,1);
+}
+.appbar .ai-switch.on{ background: color-mix(in oklab, var(--ok) 90%, transparent); }
+.appbar .ai-switch.on::after{ transform: translateX(22px); }
+/* dark mode keeps same look on gradient */
+[data-theme="dark"] .ai-label{color:#fff}
+
+/* QC comment boxes */
+.qcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:8px}
+.qcbox{border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--card)}
+.qcbox.good{border-color:var(--ok)}
+.qcbox.acc{border-color:var(--warn)}
+.qcbox.bad{border-color:var(--danger)}
+.qcbox .grade{display:inline-block;border-radius:8px;padding:2px 8px;font-weight:800;margin-bottom:6px}
+.qcbox.good .grade{background:color-mix(in oklab,var(--ok) 20%,transparent)}
+.qcbox.acc .grade{background:color-mix(in oklab,var(--warn) 20%,transparent)}
+.qcbox.bad .grade{background:color-mix(in oklab,var(--danger) 20%,transparent)}
+
+.evchip{display:inline-block;margin:0 6px 6px 0;padding:6px 10px;border:1px solid var(--border);
+  border-radius:999px;background:var(--zebra);text-decoration:none;line-height:1.2}                  
+.appbar .seg{display:flex;border:1px solid rgba(255,255,255,.35);border-radius:12px;overflow:hidden}
+.appbar .seg button{border:0;background:transparent;padding:8px 12px;color:#fff;opacity:.9;cursor:pointer}
+.appbar .seg button.active{background:rgba(255,255,255,.18);opacity:1}
+.appbar .btn{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
+.container{display:block;padding:12px 2vw;max-width:min(2000px,96vw)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px;margin-right:78px}
+.card h2{margin:0 0 8px}.section-title{display:flex;align-items:center;justify-content:space-between}.section-title small{color:var(--muted)}
+.kv{display:grid;grid-template-columns:minmax(220px, 22vw) 1fr;gap:8px 14px}.kv .label{color:var(--muted)}.sep{height:1px;background:var(--border);margin:12px 0}
+.sidebar{position:fixed;right:8px;top:64px;z-index:70}
+.sideicons{display:flex;flex-direction:column;gap:10px}
+.sideicons a{position:relative;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--border);border-radius:12px;background:var(--card);text-decoration:none;color:var(--fg);transition:transform .18s ease, background-color .18s ease, color .18s ease}
+.sideicons a:hover{transform:translateX(-8px);background:var(--accent);color:#fff}
+.sideicons a.active{outline:2px solid color-mix(in oklab,var(--accent) 45%,transparent)}
+.sideicons a span{font-size:20px}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap}
+.subtabs .subtab{
+  border:1px solid var(--border);border-radius:10px;padding:6px 10px;
+  background:var(--card);text-decoration:none
+}
+.subtabs .subtab:hover{background:var(--accent);color:#fff;border-color:transparent}                
+.sideicons a .label{position:absolute;right:52px;opacity:0;pointer-events:none;background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:12px;transform:translateX(8px);transition:opacity .18s ease, transform .18s ease}
+.sideicons a:hover .label{opacity:1;transform:translateX(0)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 8px}
+input[type="search"]{flex:1;min-width:280px;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--fg)}
+.tablewrap{max-height:65vh;overflow:auto;border:1px solid var(--border);border-radius:12px;background:var(--card);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%}
+th,td{border-bottom:1px solid var(--border);padding:10px 12px;vertical-align:top}thead th{position:sticky;top:0;background:var(--th);z-index:2;cursor:pointer;text-align:left}tbody tr:hover{background:var(--hover)}tbody tr:nth-child(even){background:var(--zebra)}
+td:first-child, th:first-child{position:sticky;left:0;z-index:3;background:var(--card)}
+.badge{display:inline-block;background:var(--chip);color:var(--chipfg);border-radius:999px;padding:4px 10px;margin:2px 4px 2px 0;font-size:12px}
+small.muted{color:var(--muted)}#counts{border:1px solid var(--border);padding:4px 10px;border-radius:999px}
+th .arrow{opacity:.4;margin-left:4px}th.sorted .arrow{opacity:1}.alert{color:var(--warn);font-weight:700;margin-right:6px}
+.linkify a{font-size:12px;text-decoration:none;border-bottom:1px dotted var(--accent);color:var(--accent)}.linkify a:hover{text-decoration:underline}
+.geneBtn{background:transparent;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;padding:0 4px;border-radius:6px}
+.inspectIcon{
+  margin-left:6px; cursor:pointer; border:1px solid var(--border);
+  background:var(--card); border-radius:999px; padding:2px 8px; font-weight:700;
+}
+.anchorlink{opacity:.6;text-decoration:none;margin-left:6px}
+.tier{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:2px 8px}.tier .dot{width:8px;height:8px;border-radius:50%}
+.evwrap{display:flex;flex-wrap:wrap;gap:10px;overflow:visible}
+.evgroup{flex:1 1 auto;border:0;background:transparent;padding:0;min-width:220px}
+.evlabel{font-size:11px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);display:block;margin:0 0 4px}
+.evchips a{
+  display:inline-block;margin:0 6px 6px 0;padding:6px 10px;
+  border:1px solid var(--border);border-radius:999px;background:var(--zebra);
+  text-decoration:none;white-space:normal;line-height:1.2
+}
+.geneBubble{
+  display:inline-block; margin:0 8px 8px 0; padding:6px 12px;
+  border:1px solid color-mix(in oklab,var(--accent) 35%,var(--border));
+  border-radius:999px; background:color-mix(in oklab,var(--accent) 10%, var(--card));
+  color:var(--accent); font-weight:800; cursor:pointer;
+}
+.pinBtn{
+  margin-left:6px; border:1px solid var(--border); background:var(--card);
+  border-radius:8px; padding:2px 6px; cursor:pointer; line-height:1;
+}
+.pinBtn.active{ background:var(--accent); color:#fff; border-color:transparent; }               
+.geneBubble:hover{ background:var(--accent); color:#fff; }
+.affGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-top:8px}
+.affItem{border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--card)}
+.affItem .title{font-weight:700;margin-bottom:4px}
+.mini{display:inline-flex;gap:6px;flex-wrap:wrap}
+.mini span{border:1px solid var(--border);border-radius:8px;padding:2px 6px;font-size:12px;background:var(--zebra)}
+#pathwayChips, #qcChips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+/* pill chips (used by pathway & QC) */
+#pathwayChips .chip, #qcChips .chip{
+  border:1px solid color-mix(in oklab,var(--accent) 35%,var(--border));
+  border-radius:999px; padding:8px 14px;
+  background:var(--card); color:var(--fg); font-weight:700;
+  box-shadow:0 1px 0 rgba(0,0,0,.04);
+}
+#pathwayChips .chip.active, #qcChips .chip.active{
+  background:var(--accent); color:#fff; border-color:transparent;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);
+}
+
+
+/* Pathway diagram centering & span */
+#pathwayOne.pflex{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+#pathwayOne > h4{ grid-column:1 / -1; }
+
+#mechPanel{
+  border:1px dashed var(--border);
+  border-radius:12px;
+  padding:10px;
+
+  /* center + span both columns */
+  grid-column:1 / -1;
+  margin:0 auto;
+  max-width:760px;
+
+  /* center its contents */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+#mechPanel svg{ margin:0 auto; display:block; }
+#mechPanel p{ max-width:760px; margin:8px auto 0; }
+
+
+
+/* dark uses the same accent fill as light */
+[data-theme="dark"] #pathwayChips .chip, [data-theme="dark"] #qcChips .chip{
+  background:var(--card); color:var(--fg);
+  border-color: color-mix(in oklab,var(--accent) 35%,var(--border));
+}
+[data-theme="dark"] #pathwayChips .chip.active, [data-theme="dark"] #qcChips .chip.active{
+  background:var(--accent); color:#fff; border-color:transparent;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.25);
+}
+
+.pcard{border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--card)}
+.pflex{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.node{cursor:pointer;transition:transform .08s ease;transform-box:fill-box;transform-origin:center}
+.node:hover{transform:scale(1.04)}
+#mechPanel{border:1px dashed var(--border);border-radius:12px;padding:10px}
+#inspector{position:fixed;right:0;top:0;bottom:0;width:520px;max-width:96vw;background:var(--card);border-left:1px solid var(--border);box-shadow:var(--shadow);transform:translateX(100%);transition:transform .25s ease;z-index:80}
+#inspector.open{transform:translateX(0)}
+.ins-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border)}
+.ins-body{padding:12px 14px;overflow:auto;height:calc(100% - 52px)}
+.card-lite{border:1px dashed var(--border);border-radius:10px;padding:10px;margin-top:6px}
+.kv2{display:grid;grid-template-columns:140px 1fr;gap:8px}
+#clinCards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.cCard{border:1px solid var(--border);border-radius:14px;padding:12px;background:var(--card);
+  box-shadow:var(--shadow)}
+.cHead{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.cGene{font-weight:800;font-size:14px}
+.cType{background:var(--chip);color:var(--chipfg);border-radius:999px;padding:2px 8px;font-size:12px}
+.cBody{border-left:3px solid color-mix(in oklab,var(--accent) 70%,transparent);padding-left:10px}
+.cRefs{margin-top:6px}
+#help{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:90}
+#help .box{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px;max-width:700px;width:96vw}
+kbd{border:1px solid var(--border);padding:2px 6px;border-radius:6px}
+@media (min-width:1600px){.container{max-width:min(2200px,96vw)}.kv{grid-template-columns:minmax(260px,26vw) 1fr}th,td{padding:12px 16px}}
+@media print{.appbar,.sidebar,.controls,.pagination,#inspector,#help,#geneViewer{display:none!important}.container{padding:0}.card{page-break-inside:avoid;box-shadow:none;border-color:#888}a[href]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
+.anchor{scroll-margin-top:76px}
+/* --- AI Toggle (iOS-style switch) --- */
+.ai-switch{
+  position:relative;
+  width:54px; height:30px;
+  border-radius:999px;
+  background:#e5e7eb;                /* track OFF */
+  border:1px solid var(--border);
+  cursor:pointer; outline:0; padding:0;
+  appearance:none; -webkit-appearance:none;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.06);
+  transition:background .18s ease, box-shadow .18s ease;
+}
+.ai-switch::after{
+  content:"";
+  position:absolute; top:3px; left:3px;
+  width:24px; height:24px;
+  border-radius:50%;
+  background:#fff;                    /* knob */
+  box-shadow:0 1px 2px rgba(0,0,0,.12), 0 6px 12px rgba(0,0,0,.06);
+  transition:transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s;
+}
+.ai-switch.on{
+  background: var(--ok);              /* track ON (green) */
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.02);
+}
+.ai-switch.on::after{ transform: translateX(24px); }
+.ai-switch:focus-visible{ outline:3px solid color-mix(in oklab, var(--accent) 60%, transparent); outline-offset:3px; }
+[data-theme="dark"] .ai-switch{ background:#0f2429; }
+/* Appbar segmented controls — match pic 1 in light & dark */
+.appbar .seg{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.35);
+}
+.appbar .seg button{
+  color:#fff;
+  opacity:.95;
+}
+.appbar .seg button + button{
+  border-left:1px solid rgba(255,255,255,.35);
+}
+.appbar .seg button.active{
+  background: var(--accent) !important; /* teal fill */
+  color:#fff;
+  opacity:1;
+}
+
+
+/* --- “AI” pill wherever AI adds UI --- */
+[data-ai]::before{
+  content:"AI";
+  display:inline-block;
+  margin-right:6px;
+  padding:2px 6px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:11px;
+  line-height:1;
+  color:#fff;
+  background: var(--ok);                         /* your green */
+  vertical-align:middle;
+}
+
+</style>
+</head>
+<body>
+
+<div class="appbar" role="banner">
+  <div class="brand">
+    <img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22180%22%20height%3D%2240%22%20viewBox%3D%220%200%20540%20120%22%3E%0A%20%20%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20x2%3D%221%22%20y1%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%231aa7b6%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230d6e76%22/%3E%0A%20%20%3C/linearGradient%3E%3C/defs%3E%0A%20%20%3Crect%20fill%3D%22none%22%20width%3D%22540%22%20height%3D%22120%22/%3E%0A%20%20%3Cg%20fill%3D%22url%28%23g%29%22%3E%3Ctext%20x%3D%2210%22%20y%3D%2285%22%20font-family%3D%22Segoe%20UI%2C%20Arial%2C%20sans-serif%22%20font-size%3D%2288%22%20font-weight%3D%22700%22%3EOpenCARE%3C/text%3E%3C/g%3E%0A%20%20%3Cpath%20d%3D%22M62%2048c12-16%2032-22%2048-18-9%2010-26%2020-48%2018z%22%20fill%3D%22%2312c3d6%22/%3E%0A%3C/svg%3E" alt="OpenCARE logo" />
+    <div class="name">OpenCARE · <span style="opacity:.9">Pipeline Reports</span></div>
+    <span class="pill" id="metaVer" aria-label="Report version" style="border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:3px 8px;font-size:12px;opacity:.9"></span>
+
+    <div class="seg" role="tablist" aria-label="Theme" style="margin-left:8px">
+      <button id="lightBtn" role="tab" aria-selected="true" class="active">Light</button>
+      <button id="darkBtn" role="tab" aria-selected="false">Dark</button>
+    </div>
+
+    <div class="seg" role="tablist" aria-label="View mode">
+      <button id="summaryBtn" role="tab" aria-selected="true" class="active">Summary</button>
+      <button id="detailedBtn" role="tab" aria-selected="false">Detailed</button>
+    </div>
+
+    <!-- AI Assist control -->
+    <div class="ai-ctl" aria-label="AI Assist">
+      <span class="ai-label">AI Assist</span>
+      <button id="btn-ai" class="ai-switch" role="switch" aria-checked="false" title="Toggle AI annotations"></button>
+    </div>
+  </div>
+
+  <div class="right">
+    <button class="btn" id="helpBtn" aria-haspopup="dialog" aria-controls="help">?</button>
+    <button class="btn" onclick="window.print()" aria-label="Print to PDF">Print/PDF</button>
+    <button class="btn" id="tbBtn" title="Download tumor board (HTML)">Tumor board</button>
+    <button class="btn" id="csvBtn">CSV</button>
+    <button class="btn" id="jsonBtn">JSON</button>
+    <button class="btn" id="mcodeBtn">FHIR/mCODE</button>
+  </div>
+</div>
+
+<div class="container">
+  <main>
+    <section id="summary" class="card anchor" aria-labelledby="h-summary">
+      <div class="section-title">
+        <h2 id="h-summary">1. Summary</h2>
+        <small id="crumbs"></small>
+      </div>
+
+      <div class="kv" role="list">
+        <div class="label" role="listitem">Diagnosis</div><div id="diag"></div>
+        <div class="label" role="listitem">Patient ID</div><div id="pid"></div>
+        <div class="label" role="listitem">Alternate ID</div><div id="altid"></div>
+        <div class="label" role="listitem">Report Date</div><div id="rdate"></div>
+        <div class="label" role="listitem">Case Type</div><div id="ctype"></div>
+        <div class="label" role="listitem">Physician</div><div id="phys"></div>
+        <div class="label" role="listitem">Biopsy Name</div><div id="bname"></div>
+        <div class="label" role="listitem">Biopsy Details</div><div id="bdet"></div>
+        <div class="label" role="listitem">Gender</div><div id="gender"></div>
+      </div>
+      <div class="sep"></div>
+
+      <div id="clinCommentsSec">
+        <h3>Clinical Comments</h3>
+        <div id="clinCards"></div>
+        <div class="sep"></div>
+      </div>
+
+      <h3>Tumour Summary</h3>
+      <div class="kv">
+        <div class="label">Tumour Content</div><div id="tcontent"></div>
+        <div class="label">Microbial Species</div><div id="microb"></div>
+        <div class="label">Mutation Signatures</div><div id="mutsig"></div>
+        <div class="label">SV Burden</div><div id="svb"></div>
+      </div>
+
+      <div id="qcBlock" style="display:none">
+        <div class="sep"></div>
+        <h3>QC Summary</h3>
+        <div class="kv" id="qcSummary"></div>
+        <div style="height:6px"></div>
+        <div id="qcChips"></div>
+        <div id="qcPanel" class="pcard"></div>
+      </div>
+    </section>
+
+<section id="therapeutic" class="card anchor" aria-labelledby="h-ther">
+  <div class="section-title">
+    <h2 id="h-ther">2. Therapeutic Alterations (Detailed)</h2>
+    <small id="counts" aria-live="polite"></small>
+  </div>
+  <div class="controls">
+    <input id="q" type="search" placeholder="Filter gene / variant / organ / therapy / evidence…" aria-label="Quick filter"/>
+    <button class="btn" id="resetBtn">Reset</button>
+  </div>
+  <div class="tablewrap" role="region" aria-label="Therapeutic Alterations Table">
+    <table id="tbl" role="table" aria-describedby="h-ther">
+      <thead>
+        <tr role="row">
+          <th role="columnheader" data-k="gene">Gene <span class="arrow">↕</span></th>
+          <th role="columnheader" data-k="hgvsp">Observed Variant <span class="arrow">↕</span></th>
+          <th role="columnheader" data-k="known">Known/Hotspot <span class="arrow">↕</span></th>
+          <th role="columnheader" data-k="locus">Locus <span class="arrow">↕</span></th>
+          <th role="columnheader" data-k="cancer_type">Cancer Type <span class="arrow">↕</span></th>
+          <th role="columnheader" data-k="association">Clinical Association <span class="arrow">↕</span></th>
+          <th role="columnheader" data-k="tier">Tier <span class="arrow">↕</span></th>
+          <th role="columnheader">Metrics</th>
+          <th role="columnheader">Treatment Evidence</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+    <section id="pathways" class="card anchor" aria-labelledby="h-path">
+      <div class="section-title">
+        <h2 id="h-path">3. Pathway Analysis</h2>
+        <small>Pick an affected pathway, then click a highlighted node for ~50-word mechanism + references</small>
+      </div>
+      <div id="pathwayFilterBar" class="seg" role="tablist" aria-label="Pathway filter" style="margin:6px 0 10px">
+        <button id="pfAll" class="active" aria-selected="true">All</button>
+        <button id="pfAffected" aria-selected="false">Affected</button>
+      </div>
+      <div id="pathwayChips"></div>
+      <div id="pathwayOne" class="pcard pflex"></div>
+    </section>
+  </main>
+</div>
+
+<aside class="sidebar" role="navigation" aria-label="Report Sections">
+  <div class="sideicons">
+    <a href="#summary"><span>🧾</span><em class="label">Summary</em></a>
+    <a href="#therapeutic"><span>💊</span><em class="label">Therapeutic</em></a>
+    <a href="#pathways"><span>🧬</span><em class="label">Pathways</em></a>
+  </div>
+</aside>
+
+<div id="inspector" aria-hidden="true" role="dialog" aria-labelledby="insTitle">
+  <div class="ins-header">
+    <strong id="insTitle">Variant</strong>
+    <button class="btn" id="insClose" aria-label="Close inspector">Close</button>
+  </div>
+  <div class="ins-body">
+    <div class="kv2">
+      <div class="label">Gene</div><div id="insGene"></div>
+      <div class="label">Protein</div><div id="insProt"></div>
+      <div class="label">Consequence</div><div id="insCons"></div>
+      <div class="label">Effect</div><div id="insEffect"></div>            
+      <div class="label">Tier</div><div id="insTier"></div>
+      <div class="label">Locus</div><div id="insLocus"></div>
+      <div class="label">Cancer Type</div><div id="insCancer"></div>
+      <div class="label">Association</div><div id="insAssoc"></div>
+      <div class="label">Depth (DP)</div><div id="insDP"></div>
+      <div class="label">Alleles (AD)</div><div id="insAD"></div>
+      <div class="label">VAF</div><div id="insVAF"></div>
+      <div class="label">QUAL</div><div id="insQUAL"></div>
+    </div>
+    <div class="card-lite" id="insLinks" aria-label="External links"></div>
+    <h4>Treatments</h4>
+    <div id="insTreats"></div>
+  </div>
+</div>
+
+<div id="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle" style="display:none">
+  <div class="box">
+    <h3 id="helpTitle">Keyboard & Tips</h3>
+    <ul><li><kbd>/</kbd> focus search</li><li><kbd>Esc</kbd> close modals</li></ul>
+    <div style="text-align:right"><button class="btn" id="helpClose">Close</button></div>
+  </div>
+</div>
+
+<script>
+const report      = {"meta": {"report_version": "PRO v3.2 (toy)", "reference": "hg38", "generated_on": "2025-08-30"}, "patient": {"cancer": "Lung adenocarcinoma (toy)", "id": "DEMO-TOY-001", "alt_id": "ALT-1001", "report_date": "2025-08-30", "age_group": "adult", "physician": "Dr. Demo", "biopsy_name": "Lung biopsy", "biopsy_details": "FFPE", "gender": "Female"}, "summary": {"tumor_content": "~30%", "mutation_signatures": ["SBS4"], "sv_burden": "Low"}, "qc": {"panel": {"coverage_mean": 500, "pct_gt100x": 0.95, "on_target_rate": 0.91}, "dup_rate": 0.07, "contamination": 0.006, "insert_median": 250, "read_q30": 0.92}, "rows": [{"gene": "EGFR", "hgvsp": "p.L858R", "consequence": "missense_variant", "chrom": "chr7", "pos": 55191822, "ref": "T", "alt": "G", "cancer_type": "NSCLC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Osimertinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/208065s033lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/208065s033lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208065"}, {"type": "knowledge", "label": "OncoKB: EGFR", "url": "https://www.oncokb.org/gene/EGFR"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/208065s033lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208065"}, {"type": "knowledge", "label": "OncoKB: EGFR", "url": "https://www.oncokb.org/gene/EGFR"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/208065s033lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208065"}, {"type": "knowledge", "label": "OncoKB: EGFR", "url": "https://www.oncokb.org/gene/EGFR"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "activation", "clinical_comment": "EGFR p.L858R: Activating alteration with label-supported benefit. Context: NSCLC; therapy: Osimertinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/EGFR"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC+Osimertinib+EGFR+p.L858R&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC&term=Osimertinib", "oncokb": "https://www.oncokb.org/gene/EGFR", "civic": "https://civicdb.org/search?q=EGFR+p.L858R", "google": "https://www.google.com/search?q=NSCLC+Osimertinib+EGFR+p.L858R"}, "notes": "Sensitizing EGFR mutation; first-line or subsequent per label."}, {"gene": "ALK", "hgvsp": "EML4-ALK", "consequence": "fusion", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "NSCLC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Alectinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/208434s018lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/208434s018lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208434"}, {"type": "knowledge", "label": "OncoKB: ALK", "url": "https://www.oncokb.org/gene/ALK"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/208434s018lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208434"}, {"type": "knowledge", "label": "OncoKB: ALK", "url": "https://www.oncokb.org/gene/ALK"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/208434s018lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208434"}, {"type": "knowledge", "label": "OncoKB: ALK", "url": "https://www.oncokb.org/gene/ALK"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "rewiring/activation", "clinical_comment": "ALK EML4-ALK: Fusion-driven signaling; label-supported benefit. Context: NSCLC; therapy: Alectinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/ALK"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC+Alectinib+ALK+EML4-ALK&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC&term=Alectinib", "oncokb": "https://www.oncokb.org/gene/ALK", "civic": "https://civicdb.org/search?q=ALK+EML4-ALK", "google": "https://www.google.com/search?q=NSCLC+Alectinib+ALK+EML4-ALK"}, "notes": "Fusion-positive NSCLC; preferred first-line."}, {"gene": "ROS1", "hgvsp": "ROS1 fusion", "consequence": "fusion", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "NSCLC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Entrectinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212725s009lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212725s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=212725"}, {"type": "knowledge", "label": "OncoKB: ROS1", "url": "https://www.oncokb.org/gene/ROS1"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212725s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=212725"}, {"type": "knowledge", "label": "OncoKB: ROS1", "url": "https://www.oncokb.org/gene/ROS1"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212725s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=212725"}, {"type": "knowledge", "label": "OncoKB: ROS1", "url": "https://www.oncokb.org/gene/ROS1"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "rewiring/activation", "clinical_comment": "ROS1 FUSION: Fusion-driven signaling; label-supported benefit. Context: NSCLC; therapy: Entrectinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/ROS1"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC+Entrectinib+ROS1+ROS1 fusion&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC&term=Entrectinib", "oncokb": "https://www.oncokb.org/gene/ROS1", "civic": "https://civicdb.org/search?q=ROS1+ROS1+fusion", "google": "https://www.google.com/search?q=NSCLC+Entrectinib+ROS1+ROS1 fusion"}, "notes": "ROS1+ NSCLC indication."}, {"gene": "RET", "hgvsp": "RET fusion", "consequence": "fusion", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "NSCLC/Thyroid", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Selpercatinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/213246s014lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/213246s014lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213246"}, {"type": "knowledge", "label": "OncoKB: RET", "url": "https://www.oncokb.org/gene/RET"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/213246s014lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213246"}, {"type": "knowledge", "label": "OncoKB: RET", "url": "https://www.oncokb.org/gene/RET"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/213246s014lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213246"}, {"type": "knowledge", "label": "OncoKB: RET", "url": "https://www.oncokb.org/gene/RET"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "rewiring/activation", "clinical_comment": "RET FUSION: Fusion-driven signaling; label-supported benefit. Context: NSCLC/Thyroid; therapy: Selpercatinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/RET"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC/Thyroid+Selpercatinib+RET+RET fusion&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC%2FThyroid&term=Selpercatinib", "oncokb": "https://www.oncokb.org/gene/RET", "civic": "https://civicdb.org/search?q=RET+RET+fusion", "google": "https://www.google.com/search?q=NSCLC/Thyroid+Selpercatinib+RET+RET fusion"}, "notes": "RET fusions; NSCLC and thyroid."}, {"gene": "NTRK", "hgvsp": "NTRK fusion", "consequence": "fusion", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "Solid tumors", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Larotrectinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/211710s009lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/211710s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211710"}, {"type": "knowledge", "label": "OncoKB: NTRK", "url": "https://www.oncokb.org/gene/NTRK"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/211710s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211710"}, {"type": "knowledge", "label": "OncoKB: NTRK", "url": "https://www.oncokb.org/gene/NTRK"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/211710s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211710"}, {"type": "knowledge", "label": "OncoKB: NTRK", "url": "https://www.oncokb.org/gene/NTRK"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "rewiring/activation", "clinical_comment": "NTRK FUSION: Fusion-driven signaling; label-supported benefit. Context: Solid tumors; therapy: Larotrectinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/NTRK"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=Solid tumors+Larotrectinib+NTRK+NTRK fusion&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=Solid+tumors&term=Larotrectinib", "oncokb": "https://www.oncokb.org/gene/NTRK", "civic": "https://civicdb.org/search?q=NTRK+NTRK+fusion", "google": "https://www.google.com/search?q=Solid tumors+Larotrectinib+NTRK+NTRK fusion"}, "notes": "Tissue-agnostic; NTRK fusion."}, {"gene": "BRAF", "hgvsp": "p.V600E", "consequence": "missense_variant", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "CRC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Encorafenib + Cetuximab", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/210496s015lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/210496s015lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210496"}, {"type": "knowledge", "label": "OncoKB: BRAF", "url": "https://www.oncokb.org/gene/BRAF"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/210496s015lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210496"}, {"type": "knowledge", "label": "OncoKB: BRAF", "url": "https://www.oncokb.org/gene/BRAF"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/210496s015lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210496"}, {"type": "knowledge", "label": "OncoKB: BRAF", "url": "https://www.oncokb.org/gene/BRAF"}], "pathways": ["RAS–MAPK"], "pathway_effect": "activation", "clinical_comment": "BRAF p.V600E: Activating alteration with label-supported benefit. Context: CRC; therapy: Encorafenib + Cetuximab.", "links": {"OncoKB": "https://www.oncokb.org/gene/BRAF"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=CRC+Encorafenib + Cetuximab+BRAF+p.V600E&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=CRC&term=Encorafenib+%2B+Cetuximab", "oncokb": "https://www.oncokb.org/gene/BRAF", "civic": "https://civicdb.org/search?q=BRAF+p.V600E", "google": "https://www.google.com/search?q=CRC+Encorafenib + Cetuximab+BRAF+p.V600E"}, "notes": "BRAF V600E mCRC; combos per label."}, {"gene": "BRAF", "hgvsp": "p.V600E", "consequence": "missense_variant", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "NSCLC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Encorafenib + Binimetinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/210496s015lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/210496s015lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210496"}, {"type": "knowledge", "label": "OncoKB: BRAF", "url": "https://www.oncokb.org/gene/BRAF"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/210496s015lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210496"}, {"type": "knowledge", "label": "OncoKB: BRAF", "url": "https://www.oncokb.org/gene/BRAF"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/210496s015lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210496"}, {"type": "knowledge", "label": "OncoKB: BRAF", "url": "https://www.oncokb.org/gene/BRAF"}], "pathways": ["RAS–MAPK"], "pathway_effect": "activation", "clinical_comment": "BRAF p.V600E: Activating alteration with label-supported benefit. Context: NSCLC; therapy: Encorafenib + Binimetinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/BRAF"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC+Encorafenib + Binimetinib+BRAF+p.V600E&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC&term=Encorafenib+%2B+Binimetinib", "oncokb": "https://www.oncokb.org/gene/BRAF", "civic": "https://civicdb.org/search?q=BRAF+p.V600E", "google": "https://www.google.com/search?q=NSCLC+Encorafenib + Binimetinib+BRAF+p.V600E"}, "notes": "BRAF V600E NSCLC."}, {"gene": "KRAS", "hgvsp": "p.G12C", "consequence": "missense_variant", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "NSCLC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Sotorasib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/214665s012lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/214665s012lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=214665"}, {"type": "knowledge", "label": "OncoKB: KRAS", "url": "https://www.oncokb.org/gene/KRAS"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/214665s012lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=214665"}, {"type": "knowledge", "label": "OncoKB: KRAS", "url": "https://www.oncokb.org/gene/KRAS"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/214665s012lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=214665"}, {"type": "knowledge", "label": "OncoKB: KRAS", "url": "https://www.oncokb.org/gene/KRAS"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "activation", "clinical_comment": "KRAS p.G12C: Activating alteration with label-supported benefit. Context: NSCLC; therapy: Sotorasib.", "links": {"OncoKB": "https://www.oncokb.org/gene/KRAS"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC+Sotorasib+KRAS+p.G12C&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC&term=Sotorasib", "oncokb": "https://www.oncokb.org/gene/KRAS", "civic": "https://civicdb.org/search?q=KRAS+p.G12C", "google": "https://www.google.com/search?q=NSCLC+Sotorasib+KRAS+p.G12C"}, "notes": "Post-PD-(L)1 + platinum chemo."}, {"gene": "KRAS", "hgvsp": "p.G12C", "consequence": "missense_variant", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "NSCLC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Adagrasib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/216340s000lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/216340s000lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=216340"}, {"type": "knowledge", "label": "OncoKB: KRAS", "url": "https://www.oncokb.org/gene/KRAS"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/216340s000lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=216340"}, {"type": "knowledge", "label": "OncoKB: KRAS", "url": "https://www.oncokb.org/gene/KRAS"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/216340s000lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=216340"}, {"type": "knowledge", "label": "OncoKB: KRAS", "url": "https://www.oncokb.org/gene/KRAS"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "activation", "clinical_comment": "KRAS p.G12C: Activating alteration with label-supported benefit. Context: NSCLC; therapy: Adagrasib.", "links": {"OncoKB": "https://www.oncokb.org/gene/KRAS"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC+Adagrasib+KRAS+p.G12C&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC&term=Adagrasib", "oncokb": "https://www.oncokb.org/gene/KRAS", "civic": "https://civicdb.org/search?q=KRAS+p.G12C", "google": "https://www.google.com/search?q=NSCLC+Adagrasib+KRAS+p.G12C"}, "notes": "Alternate G12C inhibitor."}, {"gene": "MET", "hgvsp": "exon 14 skipping", "consequence": "splice_variant", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "NSCLC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Capmatinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/213591s012lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/213591s012lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213591"}, {"type": "knowledge", "label": "OncoKB: MET", "url": "https://www.oncokb.org/gene/MET"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/213591s012lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213591"}, {"type": "knowledge", "label": "OncoKB: MET", "url": "https://www.oncokb.org/gene/MET"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/213591s012lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213591"}, {"type": "knowledge", "label": "OncoKB: MET", "url": "https://www.oncokb.org/gene/MET"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "activation", "clinical_comment": "MET exon14_skipping: Activating alteration with label-supported benefit. Context: NSCLC; therapy: Capmatinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/MET"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC+Capmatinib+MET+exon 14 skipping&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC&term=Capmatinib", "oncokb": "https://www.oncokb.org/gene/MET", "civic": "https://civicdb.org/search?q=MET+exon+14+skipping", "google": "https://www.google.com/search?q=NSCLC+Capmatinib+MET+exon 14 skipping"}, "notes": "METex14+ NSCLC."}, {"gene": "MET", "hgvsp": "exon 14 skipping", "consequence": "splice_variant", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "NSCLC", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Tepotinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/214096s010lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/214096s010lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=214096"}, {"type": "knowledge", "label": "OncoKB: MET", "url": "https://www.oncokb.org/gene/MET"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/214096s010lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=214096"}, {"type": "knowledge", "label": "OncoKB: MET", "url": "https://www.oncokb.org/gene/MET"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/214096s010lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=214096"}, {"type": "knowledge", "label": "OncoKB: MET", "url": "https://www.oncokb.org/gene/MET"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "activation", "clinical_comment": "MET exon14_skipping: Activating alteration with label-supported benefit. Context: NSCLC; therapy: Tepotinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/MET"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=NSCLC+Tepotinib+MET+exon 14 skipping&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=NSCLC&term=Tepotinib", "oncokb": "https://www.oncokb.org/gene/MET", "civic": "https://civicdb.org/search?q=MET+exon+14+skipping", "google": "https://www.google.com/search?q=NSCLC+Tepotinib+MET+exon 14 skipping"}, "notes": "METex14+ NSCLC."}, {"gene": "FGFR2", "hgvsp": "FGFR2 fusion", "consequence": "fusion", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "Cholangiocarcinoma", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Pemigatinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2021/213736s002lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2021/213736s002lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213736"}, {"type": "knowledge", "label": "OncoKB: FGFR2", "url": "https://www.oncokb.org/gene/FGFR2"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2021/213736s002lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213736"}, {"type": "knowledge", "label": "OncoKB: FGFR2", "url": "https://www.oncokb.org/gene/FGFR2"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2021/213736s002lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213736"}, {"type": "knowledge", "label": "OncoKB: FGFR2", "url": "https://www.oncokb.org/gene/FGFR2"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "rewiring/activation", "clinical_comment": "FGFR2 FUSION: Fusion-driven signaling; label-supported benefit. Context: Cholangiocarcinoma; therapy: Pemigatinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/FGFR2"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=Cholangiocarcinoma+Pemigatinib+FGFR2+FGFR2 fusion&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=Cholangiocarcinoma&term=Pemigatinib", "oncokb": "https://www.oncokb.org/gene/FGFR2", "civic": "https://civicdb.org/search?q=FGFR2+FGFR2+fusion", "google": "https://www.google.com/search?q=Cholangiocarcinoma+Pemigatinib+FGFR2+FGFR2 fusion"}, "notes": "Previously treated FGFR2 fusion cholangio."}, {"gene": "FGFR2", "hgvsp": "FGFR2 fusion", "consequence": "fusion", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "Cholangiocarcinoma", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Futibatinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/215383s006lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/215383s006lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215383"}, {"type": "knowledge", "label": "OncoKB: FGFR2", "url": "https://www.oncokb.org/gene/FGFR2"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/215383s006lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215383"}, {"type": "knowledge", "label": "OncoKB: FGFR2", "url": "https://www.oncokb.org/gene/FGFR2"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/215383s006lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215383"}, {"type": "knowledge", "label": "OncoKB: FGFR2", "url": "https://www.oncokb.org/gene/FGFR2"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "rewiring/activation", "clinical_comment": "FGFR2 FUSION: Fusion-driven signaling; label-supported benefit. Context: Cholangiocarcinoma; therapy: Futibatinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/FGFR2"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=Cholangiocarcinoma+Futibatinib+FGFR2+FGFR2 fusion&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=Cholangiocarcinoma&term=Futibatinib", "oncokb": "https://www.oncokb.org/gene/FGFR2", "civic": "https://civicdb.org/search?q=FGFR2+FGFR2+fusion", "google": "https://www.google.com/search?q=Cholangiocarcinoma+Futibatinib+FGFR2+FGFR2 fusion"}, "notes": "FGFR2 fusion cholangio."}, {"gene": "FGFR3", "hgvsp": "—", "consequence": "activating", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "Urothelial", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Erdafitinib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212018s00Xlbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212018s00Xlbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=212018"}, {"type": "knowledge", "label": "OncoKB: FGFR3", "url": "https://www.oncokb.org/gene/FGFR3"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212018s00Xlbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=212018"}, {"type": "knowledge", "label": "OncoKB: FGFR3", "url": "https://www.oncokb.org/gene/FGFR3"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212018s00Xlbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=212018"}, {"type": "knowledge", "label": "OncoKB: FGFR3", "url": "https://www.oncokb.org/gene/FGFR3"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "activation", "clinical_comment": "FGFR3 activating: Activating alteration with label-supported benefit. Context: Urothelial; therapy: Erdafitinib.", "links": {"OncoKB": "https://www.oncokb.org/gene/FGFR3"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=Urothelial+Erdafitinib+FGFR3+—&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=Urothelial&term=Erdafitinib", "oncokb": "https://www.oncokb.org/gene/FGFR3", "civic": "https://civicdb.org/search?q=FGFR3+%E2%80%94", "google": "https://www.google.com/search?q=Urothelial+Erdafitinib+FGFR3+—"}, "notes": "FGFR2/3 alt-positive mUC."}, {"gene": "ERBB2", "hgvsp": "AMP or IHC3+", "consequence": "missense_variant", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "Solid tumors", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Trastuzumab deruxtecan", "evidence": "FDA announcement", "source_url": "https://www.fda.gov/drugs/resources-information-approved-drugs/fda-grants-accelerated-approval-fam-trastuzumab-deruxtecan-nxki-unresectable-or-metastatic-her2", "references": [{"type": "primary", "label": "FDA announcement", "url": "https://www.fda.gov/drugs/resources-information-approved-drugs/fda-grants-accelerated-approval-fam-trastuzumab-deruxtecan-nxki-unresectable-or-metastatic-her2"}, {"type": "knowledge", "label": "OncoKB: ERBB2", "url": "https://www.oncokb.org/gene/ERBB2"}]}], "references": [{"type": "primary", "label": "FDA announcement", "url": "https://www.fda.gov/drugs/resources-information-approved-drugs/fda-grants-accelerated-approval-fam-trastuzumab-deruxtecan-nxki-unresectable-or-metastatic-her2"}, {"type": "knowledge", "label": "OncoKB: ERBB2", "url": "https://www.oncokb.org/gene/ERBB2"}], "citations": [{"type": "primary", "label": "FDA announcement", "url": "https://www.fda.gov/drugs/resources-information-approved-drugs/fda-grants-accelerated-approval-fam-trastuzumab-deruxtecan-nxki-unresectable-or-metastatic-her2"}, {"type": "knowledge", "label": "OncoKB: ERBB2", "url": "https://www.oncokb.org/gene/ERBB2"}], "pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "pathway_effect": "activation", "clinical_comment": "ERBB2 AMP or IHC3+: Activating alteration with label-supported benefit. Context: Solid tumors; therapy: Trastuzumab deruxtecan.", "links": {"OncoKB": "https://www.oncokb.org/gene/ERBB2"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=Solid tumors+Trastuzumab deruxtecan+ERBB2+AMP or IHC3+&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=Solid+tumors&term=Trastuzumab+deruxtecan", "oncokb": "https://www.oncokb.org/gene/ERBB2", "civic": "https://civicdb.org/search?q=ERBB2+AMP+or+IHC3%2B", "google": "https://www.google.com/search?q=Solid tumors+Trastuzumab deruxtecan+ERBB2+AMP or IHC3+"}, "notes": "2024 tissue-agnostic HER2 IHC3+."}, {"gene": "PIK3CA", "hgvsp": "—", "consequence": "activating", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "HR+/HER2− Breast", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Alpelisib + Fulvestrant", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212526s009lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212526s009lbl.pdf"}, {"type": "knowledge", "label": "OncoKB: PIK3CA", "url": "https://www.oncokb.org/gene/PIK3CA"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212526s009lbl.pdf"}, {"type": "knowledge", "label": "OncoKB: PIK3CA", "url": "https://www.oncokb.org/gene/PIK3CA"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/212526s009lbl.pdf"}, {"type": "knowledge", "label": "OncoKB: PIK3CA", "url": "https://www.oncokb.org/gene/PIK3CA"}], "pathways": ["PI3K–AKT–mTOR"], "pathway_effect": "activation", "clinical_comment": "PIK3CA activating: Activating alteration with label-supported benefit. Context: HR+/HER2− Breast; therapy: Alpelisib + Fulvestrant.", "links": {"OncoKB": "https://www.oncokb.org/gene/PIK3CA"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=HR+/HER2− Breast+Alpelisib + Fulvestrant+PIK3CA+—&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=HR%2B%2FHER2%E2%88%92+Breast&term=Alpelisib+%2B+Fulvestrant", "oncokb": "https://www.oncokb.org/gene/PIK3CA", "civic": "https://civicdb.org/search?q=PIK3CA+%E2%80%94", "google": "https://www.google.com/search?q=HR+/HER2− Breast+Alpelisib + Fulvestrant+PIK3CA+—"}, "notes": "PIK3CA+ HR+ breast (PIQRAY)."}, {"gene": "IDH1", "hgvsp": "—", "consequence": "pathogenic", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "Cholangiocarcinoma", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Ivosidenib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/211192s009lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/211192s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211192"}, {"type": "knowledge", "label": "OncoKB: IDH1", "url": "https://www.oncokb.org/gene/IDH1"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/211192s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211192"}, {"type": "knowledge", "label": "OncoKB: IDH1", "url": "https://www.oncokb.org/gene/IDH1"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/211192s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211192"}, {"type": "knowledge", "label": "OncoKB: IDH1", "url": "https://www.oncokb.org/gene/IDH1"}], "pathways": ["Oncometabolism (IDH1/2)"], "pathway_effect": "rewiring (oncometabolite)", "clinical_comment": "IDH1 mutant: Oncometabolic driver; IDH inhibitor benefit per label. Context: Cholangiocarcinoma; therapy: Ivosidenib.", "links": {"OncoKB": "https://www.oncokb.org/gene/IDH1"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=Cholangiocarcinoma+Ivosidenib+IDH1+—&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=Cholangiocarcinoma&term=Ivosidenib", "oncokb": "https://www.oncokb.org/gene/IDH1", "civic": "https://civicdb.org/search?q=IDH1+%E2%80%94", "google": "https://www.google.com/search?q=Cholangiocarcinoma+Ivosidenib+IDH1+—"}, "notes": "Previously treated cholangio."}, {"gene": "IDH1", "hgvsp": "—", "consequence": "pathogenic", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "AML", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Ivosidenib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/211192s009lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/211192s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211192"}, {"type": "knowledge", "label": "OncoKB: IDH1", "url": "https://www.oncokb.org/gene/IDH1"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/211192s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211192"}, {"type": "knowledge", "label": "OncoKB: IDH1", "url": "https://www.oncokb.org/gene/IDH1"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/211192s009lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211192"}, {"type": "knowledge", "label": "OncoKB: IDH1", "url": "https://www.oncokb.org/gene/IDH1"}], "pathways": ["Oncometabolism (IDH1/2)"], "pathway_effect": "rewiring (oncometabolite)", "clinical_comment": "IDH1 mutant: Oncometabolic driver; IDH inhibitor benefit per label. Context: AML; therapy: Ivosidenib.", "links": {"OncoKB": "https://www.oncokb.org/gene/IDH1"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=AML+Ivosidenib+IDH1+—&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=AML&term=Ivosidenib", "oncokb": "https://www.oncokb.org/gene/IDH1", "civic": "https://civicdb.org/search?q=IDH1+%E2%80%94", "google": "https://www.google.com/search?q=AML+Ivosidenib+IDH1+—"}, "notes": "AML indications per label."}, {"gene": "IDH2", "hgvsp": "—", "consequence": "pathogenic", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "AML", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Enasidenib", "evidence": "FDA letters", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2025/209606Orig1s007ltr.pdf", "references": [{"type": "primary", "label": "FDA letters", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2025/209606Orig1s007ltr.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209606"}, {"type": "knowledge", "label": "OncoKB: IDH2", "url": "https://www.oncokb.org/gene/IDH2"}]}], "references": [{"type": "primary", "label": "FDA letters", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2025/209606Orig1s007ltr.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209606"}, {"type": "knowledge", "label": "OncoKB: IDH2", "url": "https://www.oncokb.org/gene/IDH2"}], "citations": [{"type": "primary", "label": "FDA letters", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2025/209606Orig1s007ltr.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209606"}, {"type": "knowledge", "label": "OncoKB: IDH2", "url": "https://www.oncokb.org/gene/IDH2"}], "pathways": ["Oncometabolism (IDH1/2)"], "pathway_effect": "rewiring (oncometabolite)", "clinical_comment": "IDH2 mutant: Oncometabolic driver; IDH inhibitor benefit per label. Context: AML; therapy: Enasidenib.", "links": {"OncoKB": "https://www.oncokb.org/gene/IDH2"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=AML+Enasidenib+IDH2+—&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=AML&term=Enasidenib", "oncokb": "https://www.oncokb.org/gene/IDH2", "civic": "https://civicdb.org/search?q=IDH2+%E2%80%94", "google": "https://www.google.com/search?q=AML+Enasidenib+IDH2+—"}, "notes": "AML per label/letters."}, {"gene": "BRCA1", "hgvsp": "—", "consequence": "loss_of_function", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "Solid tumors", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Olaparib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/208558s028lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/208558s028lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208558"}, {"type": "knowledge", "label": "OncoKB: BRCA1", "url": "https://www.oncokb.org/gene/BRCA1"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/208558s028lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208558"}, {"type": "knowledge", "label": "OncoKB: BRCA1", "url": "https://www.oncokb.org/gene/BRCA1"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/208558s028lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208558"}, {"type": "knowledge", "label": "OncoKB: BRCA1", "url": "https://www.oncokb.org/gene/BRCA1"}], "pathways": ["Homologous recombination (HR)"], "pathway_effect": "inactivation (HRD)", "clinical_comment": "BRCA1 LoF: Loss of HRR; PARP inhibitor benefit per labels/guidelines. Context: Solid tumors; therapy: Olaparib.", "links": {"OncoKB": "https://www.oncokb.org/gene/BRCA1"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=Solid tumors+Olaparib+BRCA1+—&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=Solid+tumors&term=Olaparib", "oncokb": "https://www.oncokb.org/gene/BRCA1", "civic": "https://civicdb.org/search?q=BRCA1+%E2%80%94", "google": "https://www.google.com/search?q=Solid tumors+Olaparib+BRCA1+—"}, "notes": "Labelled indications."}, {"gene": "BRCA2", "hgvsp": "—", "consequence": "loss_of_function", "chrom": "", "pos": "", "ref": "", "alt": "", "cancer_type": "Solid tumors", "association": "Benefit — label-supported", "tier": "T1", "metrics": {"DP": 500, "AD": [220, 280], "VAF": 0.56, "QUAL": 950}, "treatments": [{"therapy": "Olaparib", "evidence": "FDA label", "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/208558s028lbl.pdf", "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/208558s028lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208558"}, {"type": "knowledge", "label": "OncoKB: BRCA2", "url": "https://www.oncokb.org/gene/BRCA2"}]}], "references": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/208558s028lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208558"}, {"type": "knowledge", "label": "OncoKB: BRCA2", "url": "https://www.oncokb.org/gene/BRCA2"}], "citations": [{"type": "primary", "label": "FDA label", "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/208558s028lbl.pdf"}, {"type": "fallback", "label": "Drugs@FDA application", "url": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208558"}, {"type": "knowledge", "label": "OncoKB: BRCA2", "url": "https://www.oncokb.org/gene/BRCA2"}], "pathways": ["Homologous recombination (HR)"], "pathway_effect": "inactivation (HRD)", "clinical_comment": "BRCA2 LoF: Loss of HRR; PARP inhibitor benefit per labels/guidelines. Context: Solid tumors; therapy: Olaparib.", "links": {"OncoKB": "https://www.oncokb.org/gene/BRCA2"}, "search": {"pubmed": "https://pubmed.ncbi.nlm.nih.gov/?term=Solid tumors+Olaparib+BRCA2+—&filter=years.5", "trials": "https://clinicaltrials.gov/search?cond=Solid+tumors&term=Olaparib", "oncokb": "https://www.oncokb.org/gene/BRCA2", "civic": "https://civicdb.org/search?q=BRCA2+%E2%80%94", "google": "https://www.google.com/search?q=Solid tumors+Olaparib+BRCA2+—"}, "notes": "Labelled indications."}], "pathway_intros": {"RAS–MAPK": {"intro": "Growth-factor signaling through RAS→RAF→MEK→ERK drives proliferation. Canonical activators: RTKs (EGFR/ALK/ROS1/RET/NTRK), KRAS/NRAS, BRAF.", "svg": "<svg viewBox=\"0 0 500 110\" width=\"100%\" height=\"140\">\n  <defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n    <polygon points=\"0 0, 10 3.5, 0 7\" /></marker></defs><rect x=\"10\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"50.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RTK</text><rect x=\"110\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"150.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RAS</text><rect x=\"210\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"250.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RAF</text><rect x=\"310\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"350.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">MEK</text><rect x=\"410\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"450.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">ERK</text><line x1=\"90\" y1=\"55\" x2=\"110\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"190\" y1=\"55\" x2=\"210\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"290\" y1=\"55\" x2=\"310\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"390\" y1=\"55\" x2=\"410\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/></svg>"}, "PI3K–AKT–mTOR": {"intro": "RTKs activate PI3K→PIP3→AKT→mTORC1 controlling survival and metabolism. Activators: PIK3CA, ERBB2; negative regulators: PTEN, TSC1/2.", "svg": "<svg viewBox=\"0 0 500 110\" width=\"100%\" height=\"140\">\n  <defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n    <polygon points=\"0 0, 10 3.5, 0 7\" /></marker></defs><rect x=\"10\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"50.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RTK</text><rect x=\"110\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"150.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">PI3K</text><rect x=\"210\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"250.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">PIP3</text><rect x=\"310\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"350.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">AKT</text><rect x=\"410\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"450.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">mTORC1</text><line x1=\"90\" y1=\"55\" x2=\"110\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"190\" y1=\"55\" x2=\"210\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"290\" y1=\"55\" x2=\"310\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"390\" y1=\"55\" x2=\"410\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/></svg>"}, "Homologous recombination (HR)": {"intro": "High-fidelity double-strand break repair via BRCA1/2 loading RAD51. Loss causes HRD and PARP inhibitor sensitivity.", "svg": "<svg viewBox=\"0 0 460 110\" width=\"100%\" height=\"140\">\n  <defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n    <polygon points=\"0 0, 10 3.5, 0 7\" /></marker></defs><rect x=\"10\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"70.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">DSB</text><rect x=\"160\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"220.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">BRCA1/2</text><rect x=\"310\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"370.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RAD51</text><line x1=\"130\" y1=\"55\" x2=\"160\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"280\" y1=\"55\" x2=\"310\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/></svg>"}, "Oncometabolism (IDH1/2)": {"intro": "Mutant IDH produces 2-hydroxyglutarate, rewiring epigenetics and blocking differentiation.", "svg": "<svg viewBox=\"0 0 460 110\" width=\"100%\" height=\"140\">\n  <defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n    <polygon points=\"0 0, 10 3.5, 0 7\" /></marker></defs><rect x=\"10\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"70.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">Isocitrate</text><rect x=\"160\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"220.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">α-KG</text><rect x=\"310\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"370.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">2-HG</text><line x1=\"130\" y1=\"55\" x2=\"160\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"280\" y1=\"55\" x2=\"310\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/></svg>"}}, "pathway_explanations": {"RAS–MAPK": {"intro": "Growth-factor signaling through RAS→RAF→MEK→ERK drives proliferation. Canonical activators: RTKs (EGFR/ALK/ROS1/RET/NTRK), KRAS/NRAS, BRAF.", "svg": "<svg viewBox=\"0 0 500 110\" width=\"100%\" height=\"140\">\n  <defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n    <polygon points=\"0 0, 10 3.5, 0 7\" /></marker></defs><rect x=\"10\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"50.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RTK</text><rect x=\"110\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"150.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RAS</text><rect x=\"210\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"250.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RAF</text><rect x=\"310\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"350.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">MEK</text><rect x=\"410\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"450.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">ERK</text><line x1=\"90\" y1=\"55\" x2=\"110\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"190\" y1=\"55\" x2=\"210\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"290\" y1=\"55\" x2=\"310\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"390\" y1=\"55\" x2=\"410\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/></svg>"}, "PI3K–AKT–mTOR": {"intro": "RTKs activate PI3K→PIP3→AKT→mTORC1 controlling survival and metabolism. Activators: PIK3CA, ERBB2; negative regulators: PTEN, TSC1/2.", "svg": "<svg viewBox=\"0 0 500 110\" width=\"100%\" height=\"140\">\n  <defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n    <polygon points=\"0 0, 10 3.5, 0 7\" /></marker></defs><rect x=\"10\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"50.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RTK</text><rect x=\"110\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"150.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">PI3K</text><rect x=\"210\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"250.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">PIP3</text><rect x=\"310\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"350.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">AKT</text><rect x=\"410\" y=\"40\" width=\"80\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"450.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">mTORC1</text><line x1=\"90\" y1=\"55\" x2=\"110\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"190\" y1=\"55\" x2=\"210\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"290\" y1=\"55\" x2=\"310\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"390\" y1=\"55\" x2=\"410\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/></svg>"}, "Homologous recombination (HR)": {"intro": "High-fidelity double-strand break repair via BRCA1/2 loading RAD51. Loss causes HRD and PARP inhibitor sensitivity.", "svg": "<svg viewBox=\"0 0 460 110\" width=\"100%\" height=\"140\">\n  <defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n    <polygon points=\"0 0, 10 3.5, 0 7\" /></marker></defs><rect x=\"10\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"70.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">DSB</text><rect x=\"160\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"220.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">BRCA1/2</text><rect x=\"310\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"370.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">RAD51</text><line x1=\"130\" y1=\"55\" x2=\"160\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"280\" y1=\"55\" x2=\"310\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/></svg>"}, "Oncometabolism (IDH1/2)": {"intro": "Mutant IDH produces 2-hydroxyglutarate, rewiring epigenetics and blocking differentiation.", "svg": "<svg viewBox=\"0 0 460 110\" width=\"100%\" height=\"140\">\n  <defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n    <polygon points=\"0 0, 10 3.5, 0 7\" /></marker></defs><rect x=\"10\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"70.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">Isocitrate</text><rect x=\"160\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"220.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">α-KG</text><rect x=\"310\" y=\"40\" width=\"120\" height=\"30\" rx=\"8\" ry=\"8\" stroke=\"black\" fill=\"white\"/><text x=\"370.0\" y=\"59.0\" font-size=\"11\" text-anchor=\"middle\" font-family=\"Inter,Arial\">2-HG</text><line x1=\"130\" y1=\"55\" x2=\"160\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/><line x1=\"280\" y1=\"55\" x2=\"310\" y2=\"55\" stroke=\"black\" marker-end=\"url(#arrow)\"/></svg>"}}, "ai": {"triage": [{"id": "chr7:55191822:T>G", "gene": "EGFR", "hgvsp": "p.L858R", "priority": 0.94, "tier_guess": "T1", "reasons": ["hotspot", "NSCLC context", "high VAF", "good depth"], "calibration": {"method": "isotonic", "version": "1.2.0"}, "updated_at": "2025-08-29"}], "vus": [{"id": "chr12:25398285:C>A", "gene": "KRAS", "hgvsp": "p.A59T", "plausibility": 0.72, "bucket": "research_flag", "explain": ["activating codon region (A59)", "within G-domain", "moderate conservation"]}], "trials": [{"nct": "NCT02296125", "title": "FLAURA: Osimertinib vs erlotinib/gefitinib in untreated EGFR-mutated advanced NSCLC", "phase": "III", "eligibility": {"meets": ["EGFR L858R or exon 19 del", "Stage IIIB/IV"], "excludes": ["Prior EGFR-TKI"]}, "references": [{"label": "NEJM 2018 (primary PFS)", "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa1713137"}, {"label": "NEJM 2020 (OS update)", "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa1913662"}]}, {"nct": "NCT02511106", "title": "ADAURA: Adjuvant osimertinib in resected EGFR-mutated NSCLC", "phase": "III", "eligibility": {"meets": ["EGFR L858R or exon 19 del", "Resected stage IB–IIIA"], "excludes": ["EGFR T790M"]}, "references": [{"label": "NEJM 2020 (DFS)", "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa2027071"}]}, {"nct": "NCT04035486", "title": "FLAURA2: Osimertinib + platinum-pemetrexed vs osimertinib", "phase": "III", "eligibility": {"meets": ["EGFR L858R or exon 19 del", "First-line metastatic"], "excludes": []}, "references": [{"label": "NEJM 2023 (PFS benefit)", "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa2307101"}]}], "similar_cases": [{"case_id": "FLAURA-OSI-L858R-median", "similarity": 0.78, "shared_features": ["EGFR L858R", "First-line setting"], "therapies_used": ["Osimertinib"], "outcome_summary": "Median PFS 18.9 months; OS 38.6 months in osimertinib arm (trial population).", "references": [{"label": "Soria et al., NEJM 2018", "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa1713137"}, {"label": "Ramalingam et al., NEJM 2020", "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa1913662"}]}], "pathway_impact": [{"pathway": "PI3K–AKT–mTOR", "score": 0.78, "drivers": ["PTEN p.R130Q", "EGFR p.L858R"], "notes": "Convergent activation; consider PI3K/mTOR class options where appropriate."}], "tumor_board": {"html": "<h3>Case Summary</h3><p>Key variants: EGFR p.L858R (Tier 1).</p>", "sections": [{"title": "Key variants", "items": ["EGFR p.L858R (Tier 1)"]}, {"title": "Therapy options", "items": ["Osimertinib – NCCN v2025"]}], "citations": [{"type": "Guideline", "source": "NCCN v2025", "url": "https://example.org"}]}}};
+const MCODE       = null;
+const geneDomains = {"EGFR": {"length": 1210, "domains": [["LBD", 25, 645], ["TM", 646, 668], ["Kinase", 712, 978]]}, "KRAS": {"length": 189, "domains": [["G-domain", 1, 166], ["HVR", 167, 188]]}, "BRAF": {"length": 766, "domains": [["Ras-binding", 155, 227], ["Kinase", 457, 717]]}, "BRCA1": {"length": 1863, "domains": [["RING", 24, 64], ["BRCT", 1646, 1859]]}, "BRCA2": {"length": 3418, "domains": [["BRC repeats", 1000, 2120]]}, "ALK": {"length": 1620, "domains": [["Kinase", 1116, 1378]]}, "PIK3CA": {"length": 1068, "domains": [["Helical", 545, 725], ["Kinase", 726, 1068]]}, "MET": {"length": 1390, "domains": [["Sema", 25, 516], ["TM", 930, 953], ["Kinase", 1110, 1345]]}, "RET": {"length": 1114, "domains": [["Cadherin-like", 159, 635], ["TM", 636, 658], ["Kinase", 724, 1015]]}, "ROS1": {"length": 2347, "domains": [["Kinase", 1940, 2225]]}, "NTRK1": {"length": 796, "domains": [["Kinase", 510, 790]]}, "FGFR2": {"length": 821, "domains": [["Ig-like", 150, 360], ["Kinase", 480, 760]]}, "FGFR3": {"length": 806, "domains": [["Ig-like", 150, 360], ["Kinase", 480, 760]]}, "IDH1": {"length": 414, "domains": [["Catalytic", 100, 380]]}, "IDH2": {"length": 452, "domains": [["Catalytic", 120, 400]]}, "ERBB2": {"length": 1255, "domains": [["LBD", 22, 646], ["TM", 652, 675], ["Kinase", 720, 980]]}};
+const pathwayDB   = [{"gene_symbol": "EGFR", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "ALK", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "ROS1", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "RET", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "NTRK", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "BRAF", "pathways": "RAS–MAPK"}, {"gene_symbol": "KRAS", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "MET", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "FGFR2", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "FGFR3", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "ERBB2", "pathways": "RAS–MAPK;PI3K–AKT–mTOR"}, {"gene_symbol": "PIK3CA", "pathways": "PI3K–AKT–mTOR"}, {"gene_symbol": "IDH1", "pathways": "Oncometabolism (IDH1/2)"}, {"gene_symbol": "IDH2", "pathways": "Oncometabolism (IDH1/2)"}, {"gene_symbol": "BRCA1", "pathways": "Homologous recombination (HR)"}, {"gene_symbol": "BRCA2", "pathways": "Homologous recombination (HR)"}];
+const MECH_DB     = {"EGFR": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "Ligand-activated EGFR signals via GRB2–SOS→RAS→RAF–MEK–ERK and via PI3K p85/p110→AKT→mTOR; L858R is constitutively activating.", "details": {"RAS–MAPK": {"text": "EGFR dimerization recruits GRB2–SOS to activate RAS, driving RAF–MEK–ERK signaling.", "refs": [{"label": "Yarden & Sliwkowski 2001 (ErbB→MAPK/PI3K)", "doi": "10.1038/35095000", "url": "https://doi.org/10.1038/35095000"}]}, "PI3K–AKT–mTOR": {"text": "EGFR activates class I PI3K leading to AKT and mTORC1 signaling.", "refs": [{"label": "Yarden & Sliwkowski 2001 (ErbB→MAPK/PI3K)", "doi": "10.1038/35095000", "url": "https://doi.org/10.1038/35095000"}]}}, "extra": [{"label": "Lynch et al. 2004 (EGFR L858R)", "doi": "10.1056/NEJMoa040938", "url": "https://doi.org/10.1056/NEJMoa040938"}]}, "ALK": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "EML4–ALK fusions produce a constitutively active RTK that signals through MAPK and PI3K.", "details": {"RAS–MAPK": {"text": "Oncogenic ALK activates RAS–RAF–MEK–ERK.", "refs": [{"label": "Soda et al. 2007 (EML4–ALK discovery)", "doi": "10.1038/nature05945", "url": "https://doi.org/10.1038/nature05945"}, {"label": "Hallberg & Palmer 2016 (ALK signaling review)", "doi": "10.1038/nrc.2016.4", "url": "https://doi.org/10.1038/nrc.2016.4"}]}, "PI3K–AKT–mTOR": {"text": "ALK fusions engage PI3K→AKT→mTOR survival signaling.", "refs": [{"label": "Hallberg & Palmer 2016 (ALK signaling review)", "doi": "10.1038/nrc.2016.4", "url": "https://doi.org/10.1038/nrc.2016.4"}]}}}, "ROS1": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "ROS1 fusions yield a constitutively active kinase that drives MAPK and PI3K cascades.", "details": {"RAS–MAPK": {"text": "ROS1 fusion oncoproteins constitutively activate MAPK.", "refs": [{"label": "Bergethon et al. 2012 (ROS1 in NSCLC)", "doi": "10.1200/JCO.2011.35.6345", "url": "https://doi.org/10.1200/JCO.2011.35.6345"}]}, "PI3K–AKT–mTOR": {"text": "ROS1 fusion signaling also activates PI3K–AKT.", "refs": [{"label": "Awad & Shaw 2014 (ROS1 biology review)", "doi": "10.1158/1078-0432.CCR-13-2373", "url": "https://doi.org/10.1158/1078-0432.CCR-13-2373"}]}}}, "RET": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "RET fusions (e.g., KIF5B–RET) form ligand-independent dimers that activate ERK and AKT signaling.", "details": {"RAS–MAPK": {"text": "RET fusion oncoproteins trigger RAF–MEK–ERK signaling.", "refs": [{"label": "Kohno et al., Nat Med 2012 — KIF5B–RET discovery/signaling", "url": "https://doi.org/10.1038/nm.2644"}, {"label": "Gainor et al., Oncotarget 2016 — KIF5B–RET models show p-ERK/p-AKT", "url": "https://doi.org/10.18632/oncotarget.10917"}]}, "PI3K–AKT–mTOR": {"text": "RET fusions also activate PI3K–AKT survival signaling.", "refs": [{"label": "Gainor et al., Oncotarget 2016 — KIF5B–RET models show p-ERK/p-AKT", "url": "https://doi.org/10.18632/oncotarget.10917"}]}}}, "NTRK": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "TRK (NTRK1/2/3) fusions are ligand-independent and activate ERK and AKT cascades.", "details": {"RAS–MAPK": {"text": "NTRK1 fusions drive robust ERK activation.", "refs": [{"label": "Vaishnavi et al., Nat Med 2013 — ligand-independent NTRK1 fusions", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3956652/"}]}, "PI3K–AKT–mTOR": {"text": "TRK fusion signaling also activates PI3K–AKT.", "refs": [{"label": "Drilon et al., Nat Rev Clin Oncol 2018 — TRK fusions review", "url": "https://doi.org/10.1038/s41571-018-0113-0"}]}}}, "BRAF": {"pathways": ["RAS–MAPK"], "short": "BRAF V600E is a constitutively active RAF kinase that drives MEK–ERK.", "details": {"RAS–MAPK": {"text": "V600E mimics activation-loop phosphorylation, producing RAS-independent MEK–ERK signaling.", "refs": [{"label": "Davies et al. 2002 (BRAF V600E discovery/mechanism)", "doi": "10.1038/nature00766", "url": "https://doi.org/10.1038/nature00766"}]}}}, "KRAS": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "Oncogenic KRAS signals through RAF→MEK→ERK and directly engages class I PI3K.", "details": {"RAS–MAPK": {"text": "Activated KRAS binds RAF to drive the ERK cascade.", "refs": [{"label": "Downward 2003 (RAS effector pathways review)", "doi": "10.1038/nrc969", "url": "https://doi.org/10.1038/nrc969"}]}, "PI3K–AKT–mTOR": {"text": "KRAS directly activates PI3K (p110), stimulating AKT and mTORC1.", "refs": [{"label": "Rodriguez-Viciana et al. 1994 (RAS→PI3K is direct)", "doi": "10.1038/370527a0", "url": "https://doi.org/10.1038/370527a0"}]}}}, "MET": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "MET exon 14 skipping removes the CBL-binding degron, stabilizing MET and activating ERK and AKT signaling.", "details": {"RAS–MAPK": {"text": "Oncogenic METex14 activates RAS–ERK signaling.", "refs": [{"label": "Paik et al., J Thorac Oncol 2017 — METex14 in NSCLC; responses to MET TKIs", "url": "https://www.jto.org/article/S1556-0864(17)30365-9/fulltext"}]}, "PI3K–AKT–mTOR": {"text": "MET signaling also stimulates PI3K–AKT.", "refs": [{"label": "Paik et al., J Thorac Oncol 2017 — METex14 in NSCLC; responses to MET TKIs", "url": "https://www.jto.org/article/S1556-0864(17)30365-9/fulltext"}]}}}, "FGFR2": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "FGFR2 fusions yield constitutively active dimers that activate ERK and AKT signaling (notably in cholangiocarcinoma).", "details": {"RAS–MAPK": {"text": "FGFR2 fusion kinases drive ERK signaling in intrahepatic cholangiocarcinoma.", "refs": [{"label": "Nakamura et al., Nat Commun 2014 — Recurrent FGFR2 fusions in ICC", "url": "https://doi.org/10.1038/ncomms5793"}]}, "PI3K–AKT–mTOR": {"text": "FGFRs engage PI3K–AKT survival signaling.", "refs": [{"label": "Turner & Grose, Nat Rev Cancer 2010 — FGF/FGFR→MAPK & PI3K pathways", "url": "https://doi.org/10.1038/nrc2787"}]}}}, "FGFR3": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "Activating FGFR3 alterations drive ERK and AKT/mTOR signaling, especially in urothelial cancer.", "details": {"RAS–MAPK": {"text": "FGFR3 activation stimulates downstream ERK signaling.", "refs": [{"label": "Knowles & Hurst, Nat Rev Urol 2015 — FGFR3 biology in bladder cancer", "url": "https://doi.org/10.1038/nrurol.2015.97"}]}, "PI3K–AKT–mTOR": {"text": "FGFR3 signals through PI3K–AKT in urothelial models.", "refs": [{"label": "Katoh, Int J Mol Med 2019 — FGFR3 signaling schema (ERK/AKT)", "url": "https://doi.org/10.3892/ijmm.2019.4329"}]}}}, "ERBB2": {"pathways": ["RAS–MAPK", "PI3K–AKT–mTOR"], "short": "HER2 amplification leads to strong ErbB signaling through MAPK and PI3K–AKT.", "details": {"RAS–MAPK": {"text": "HER2/ErbB dimers activate RAS→RAF–MEK–ERK.", "refs": [{"label": "Yarden & Sliwkowski 2001 (ErbB signaling)", "doi": "10.1038/35095000", "url": "https://doi.org/10.1038/35095000"}]}, "PI3K–AKT–mTOR": {"text": "HER2 strongly engages PI3K–AKT survival signaling.", "refs": [{"label": "Arteaga & Engelman 2014 (HER2 biology/therapy)", "doi": "10.1016/j.ccr.2014.04.011", "url": "https://doi.org/10.1016/j.ccr.2014.04.011"}]}}}, "PIK3CA": {"pathways": ["PI3K–AKT–mTOR"], "short": "PIK3CA hotspot mutations (e.g., E545K, H1047R) activate PI3K and downstream AKT/mTOR.", "details": {"PI3K–AKT–mTOR": {"text": "Oncogenic p110α increases PIP3, activating AKT and mTORC1.", "refs": [{"label": "Samuels et al. 2004 (PIK3CA mutations)", "doi": "10.1126/science.1096502", "url": "https://doi.org/10.1126/science.1096502"}, {"label": "Engelman 2009 (PI3K pathway review)", "doi": "10.1038/nrc2583", "url": "https://doi.org/10.1038/nrc2583"}]}}}, "IDH1": {"pathways": ["Oncometabolism (IDH1/2)"], "short": "Cancer-mutant IDH1 acquires neomorphic activity producing 2-hydroxyglutarate (2-HG), altering epigenetic regulation.", "details": {"Oncometabolism (IDH1/2)": {"text": "Mutant IDH1 converts α-KG to 2-HG, an oncometabolite that inhibits α-KG–dependent dioxygenases.", "refs": [{"label": "Dang et al. 2009 (IDH1→2-HG)", "doi": "10.1038/nature08617", "url": "https://doi.org/10.1038/nature08617"}, {"label": "Ward et al. 2010 (2-HG as oncometabolite)", "doi": "10.1016/j.ccr.2010.05.005", "url": "https://doi.org/10.1016/j.ccr.2010.05.005"}]}}}, "IDH2": {"pathways": ["Oncometabolism (IDH1/2)"], "short": "Cancer-mutant IDH2 gains neomorphic activity producing 2-hydroxyglutarate (2-HG), which inhibits α-KG–dependent dioxygenases.", "details": {"Oncometabolism (IDH1/2)": {"text": "IDH2 mutations convert α-KG to 2-HG, causing broad epigenetic dysregulation.", "refs": [{"label": "Ward et al., Cancer Cell 2010 — IDH1/2 mutations produce 2-HG", "url": "https://doi.org/10.1016/j.ccr.2010.05.017"}, {"label": "Losman & Kaelin, Annu Rev Cancer Biol 2017 — IDH1/2 & 2-HG overview", "url": "https://doi.org/10.1146/annurev-cancerbio-050216-034326"}]}}}, "BRCA1": {"pathways": ["Homologous recombination (HR)"], "short": "BRCA1 loss impairs HR by disrupting end resection and RAD51 loading.", "details": {"Homologous recombination (HR)": {"text": "BRCA1 functions in DSB end resection and with BRCA2 promotes RAD51 nucleofilament formation; loss causes HRD.", "refs": [{"label": "Roy, Chun & Powell 2012 (BRCA1/2 in HR)", "doi": "10.1038/nrc3181", "url": "https://doi.org/10.1038/nrc3181"}, {"label": "Jasin & Rothstein 2013 (HR overview)", "doi": "10.1101/cshperspect.a012740", "url": "https://doi.org/10.1101/cshperspect.a012740"}]}}}, "BRCA2": {"pathways": ["Homologous recombination (HR)"], "short": "BRCA2 loss blocks HR by preventing BRCA2-mediated loading of RAD51 onto ssDNA.", "details": {"Homologous recombination (HR)": {"text": "BRCA2 directly mediates RAD51 loading at resected DSBs; deficiency confers HRD.", "refs": [{"label": "Roy, Chun & Powell 2012 (BRCA1/2 in HR)", "doi": "10.1038/nrc3181", "url": "https://doi.org/10.1038/nrc3181"}, {"label": "Jasin & Rothstein 2013 (HR overview)", "doi": "10.1101/cshperspect.a012740", "url": "https://doi.org/10.1101/cshperspect.a012740"}]}}}};
+
+
+// Helpers
+function set(id, v){ const el=document.getElementById(id); if(el) el.textContent = v ?? ''; }
+function escapeHtml(s){return (s??'').toString().replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function locusOf(r){ const c=(r.chrom||'').toString(), p=(r.pos||'').toString(), rf=r.ref||'', al=r.alt||''; return (c&&p&&rf&&al)? `${c}:${p} ${rf}>${al}` : '—'; }
+function assocIcon(a){ if(/Benefit/i.test(a)) return `<span style="color:var(--ok)">●</span> ${escapeHtml(a)}`; if(/Resistance/i.test(a)) return `<span style="color:var(--danger)">●</span> ${escapeHtml(a)}`; return escapeHtml(a||'—'); }
+function tierBadge(tier){ const t=(tier||'').toUpperCase(); const color = /T1/.test(t)?'var(--ok)':(/T2/.test(t)?'var(--warn)':'var(--muted)'); return `<span class="tier"><span class="dot" style="background:${color}"></span>${escapeHtml(t||'—')}</span>`; }
+function isLowQuality(m){ if(!m) return false; const dp = +m.DP || 0; const qual = +m.QUAL || 0; return (dp < 30) || (qual && qual < 200); }
+
+// --- AI demo wiring (self-injecting toggle; no HTML edits needed) ---
+
+function ensureAIToggle(){
+  // Prefer the appbar; otherwise fall back to <body>
+  const host = document.querySelector('.appbar, #toolbar, #topbar, header, .topbar, .toolbar, body') || document.body;
+
+  // Already present?
+  let btn = document.getElementById('btn-ai');
+  if (btn) return btn;
+
+  // Container in the top-right; doesn't shift layout
+  const wrap = document.createElement('div');
+  wrap.id = 'ai-toggle-bar';
+  wrap.style.position = 'absolute';
+  wrap.style.top = '8px';
+  wrap.style.right = '12px';
+  wrap.style.zIndex = '70';
+
+  // iOS-style switch
+  btn = document.createElement('button');
+  btn.id = 'btn-ai';
+  btn.className = 'ai-switch';
+  btn.setAttribute('role', 'switch');
+  btn.setAttribute('aria-checked', 'false');
+  btn.title = 'Toggle AI annotations';
+
+  wrap.appendChild(btn);
+  host.appendChild(wrap);
+  return btn;
+}
+
+
+// --- AI demo wiring (integrated appbar toggle) ---
+let AI_ON = false;
+
+function renderAI(){
+  document.querySelectorAll('[data-ai]').forEach(n => n.remove());
+  if(!AI_ON || !report?.ai) return;
+  try { injectAIPriority(); } catch(e){}
+  try { injectVUSBadges(); } catch(e){}
+  try { injectTrialsCard(); } catch(e){}
+  try { injectSimilarCases(); } catch(e){}
+  try { sortPathwaysByAI(); } catch(e){}
+  try { injectQCFlags(); } catch(e){}
+}
+
+
+function removeToolbarDuplicates(){
+  // Remove extra appbars rendered inside the content
+  const bars = [...document.querySelectorAll('.appbar')];
+  if (bars.length > 1) bars.slice(1).forEach(b => b.remove());
+
+  // Kill stray copies of the Light/Dark and Summary/Detailed segments inside .container
+  document.querySelectorAll('.container .seg').forEach(seg => {
+    const txt = [...seg.querySelectorAll('button')].map(b => b.textContent.trim()).join('|');
+    if (txt === 'Light|Dark' || txt === 'Summary|Detailed') seg.remove();
+  });
+}
+
+// you already have this listener in the file — just add the call:
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btn-ai') || ensureAIToggle();
+  btn.addEventListener('click', () => {
+    AI_ON = !AI_ON;
+    btn.classList.toggle('on', AI_ON);
+    btn.setAttribute('aria-checked', AI_ON ? 'true' : 'false');
+    renderAI();
+  });
+
+  removeToolbarDuplicates(); // keeps stray appbar/segments out of the body
+});
+
+
+
+// --- /AI demo wiring ---
+
+
+// --- /AI demo wiring ---
+
+
+// -- Modules --
+function injectAIPriority(){
+  const triage = report.ai.triage || [];
+  const byId = new Map(triage.map(x => [x.id, x]));
+  const byGP = new Map(triage.map(x => [`${(x.gene||'').toUpperCase()}|${(x.hgvsp||'').toUpperCase()}`, x]));
+
+  const tbl = document.querySelector('#tbl');
+  if(!tbl) return;
+
+  const thead = tbl.tHead; if(!thead) return;
+  const hdrRow = thead.rows[0]; if(!hdrRow) return;
+  const wantIndex = 0; // right of "Gene"
+
+  if(![...hdrRow.cells].some(c => /AI priority/i.test(c.textContent||''))){
+    const th = document.createElement('th');
+    th.textContent = 'AI priority';
+    th.setAttribute('data-ai','');
+    th.style.whiteSpace='nowrap';
+    hdrRow.insertBefore(th, hdrRow.cells[wantIndex+1] || null); // after Gene
+  }
+
+  const tbody = tbl.tBodies[0]; if(!tbody) return;
+  [...tbody.rows].forEach(row => {
+    const idAttr  = row.getAttribute('data-variant-id') || '';
+    const rowGene = (row.getAttribute('data-gene')||'').toUpperCase();
+    const rowHgvsp= (row.getAttribute('data-hgvsp')||'').toUpperCase();
+    const ai = (idAttr && byId.get(idAttr)) || byGP.get(`${rowGene}|${rowHgvsp}`);
+
+    const td = row.insertCell(1);              // right of Gene
+    td.setAttribute('data-ai','');
+    if(ai){
+      td.innerHTML = `<strong>${(ai.priority*100).toFixed(0)}%</strong> <small>(${ai.tier_guess||'—'})</small>`;
+      td.title = `Reasons: ${ai.reasons?.join(', ')||'-'}`;
+    } else {
+      td.textContent = '—';
+    }
+  });
+}
+
+
+
+function injectVUSBadges(){
+  const vus = report.ai.vus || [];
+  if(!vus.length) return;
+  const byId = new Map(vus.map(x => [x.id, x]));
+  const byGP = new Map(vus.map(x => [`${(x.gene||'').toUpperCase()}|${(x.hgvsp||'').toUpperCase()}`, x]));
+
+  const rows = document.querySelectorAll('#tbl tbody tr, #variants-table tbody tr, table#tbl-variants tbody tr, table.variants tbody tr');
+  rows.forEach(r => {
+    const idAttr = r.getAttribute('data-variant-id') || '';
+    const rowGene = (r.getAttribute('data-gene')||'').toUpperCase();
+    const rowHgvsp = (r.getAttribute('data-hgvsp')||'').toUpperCase();
+
+    const v = (idAttr && byId.get(idAttr)) || byGP.get(`${rowGene}|${rowHgvsp}`);
+    if(!v || v.bucket!=='research_flag') return;
+
+    const targetCell = r.cells[0] || r;
+    const badge = document.createElement('span');
+    badge.setAttribute('data-ai','');
+    badge.style.marginLeft = '6px';
+    badge.innerHTML = `<span class="chip" title="${(v.explain||[]).join(' · ')}">VUS (AI: research flag)</span>`;
+    targetCell.appendChild(badge);
+  });
+}
+
+
+function injectTrialsCard(){
+  const trials = report.ai.trials || [];
+  if(!trials.length) return;
+  const host = document.querySelector('#trials-panel, #therapy-panel, #right-panel, #sidebar') || document.body;
+  const card = document.createElement('div');
+  card.setAttribute('data-ai','');
+  card.className = 'card';
+  card.style.marginTop = '8px';
+  const items = trials.map(t => {
+    const meets = (t.eligibility?.meets||[]).map(x=>`<li>✓ ${escapeHtml(x)}</li>`).join('');
+    const excl  = (t.eligibility?.excludes||[]).map(x=>`<li>✗ ${escapeHtml(x)}</li>`).join('');
+    const refs  = (t.references||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener">${escapeHtml(r.label||r.url)}</a>`).join(' · ');
+    return `
+      <div style="padding:8px 12px;border-top:1px solid var(--border)">
+        <div><strong>${escapeHtml(t.title||t.nct)}</strong> · ${escapeHtml(t.nct||'')} ${t.phase?`· Phase ${escapeHtml(t.phase)}`:''}</div>
+        <ul style="margin:6px 0 0 16px">${meets}${excl}</ul>
+        ${refs? `<div class="linkify" style="margin-top:6px">${refs}</div>` : ``}
+      </div>`;
+  }).join('');
+  card.innerHTML = `<div style="padding:10px 12px"><strong>Trials (AI)</strong></div>${items}`;
+  host.appendChild(card);
+}
+
+
+function injectSimilarCases(){
+  const arr = report.ai.similar_cases || [];
+  if(!arr.length) return;
+  const host = document.querySelector('#similar-panel, #right-panel, #sidebar') || document.body;
+  const card = document.createElement('div');
+  card.setAttribute('data-ai','');
+  card.className = 'card';
+  card.style.marginTop = '8px';
+  const items = arr.map(s => `
+    <div style="padding:8px 12px;border-top:1px solid var(--border)">
+      <div><strong>${escapeHtml(s.case_id)}</strong> · ${(s.similarity*100).toFixed(0)}%</div>
+      <div>Shared: ${escapeHtml((s.shared_features||[]).join(', ')||'—')}</div>
+      <div>Therapies: ${escapeHtml((s.therapies_used||[]).join(', ')||'—')}</div>
+      <div class="muted">${escapeHtml(s.outcome_summary||'')}</div>
+    </div>`).join('');
+  card.innerHTML = `<div style="padding:10px 12px"><strong>Patients-like-mine (AI)</strong></div>${items}`;
+  host.appendChild(card);
+}
+
+function sortPathwaysByAI(){
+  const data = report.ai.pathway_impact || [];
+  if(!data.length) return;
+  const score = new Map(data.map(p => [p.pathway, p]));
+  const chips = document.querySelector('#pathwayChips, #pathway-chips, #chips-pathways, .pathways');
+  if(!chips) return;
+  const nodes = [...chips.querySelectorAll('.chip')];
+  nodes.sort((a,b) => (score.get((b.textContent||'').trim())?.score||0) - (score.get((a.textContent||'').trim())?.score||0));
+  nodes.forEach(n => {
+    const p = (n.textContent||'').trim();
+    const hit = score.get(p);
+    if(hit){
+      n.setAttribute('data-ai','');
+      n.title = `AI score: ${hit.score.toFixed(2)} · Drivers: ${hit.drivers?.join(', ')||'—'}`;
+    }
+    chips.appendChild(n);
+  });
+}
+
+function injectQCFlags(){
+  const flags = report.ai.qc_flags || [];
+  if(!flags.length) return;
+  const qc = document.querySelector('#qcPanel, #qc, #quality'); if(!qc) return;
+  const wrap = document.createElement('div'); wrap.setAttribute('data-ai','');
+  wrap.style.marginTop='6px';
+  wrap.innerHTML = flags.map(f => {
+    const sev = (f.severity||'info').toLowerCase();
+    const dot = '●';
+    const title = `evidence: ${JSON.stringify(f.evidence||{})}`;
+    return `<span class="chip" title="${escapeHtml(title)}">${dot} ${escapeHtml(f.flag)} — ${escapeHtml(f.recommendation||'')}</span>`;
+  }).join(' ');
+  qc.appendChild(wrap);
+}
+
+function addTumorBoardDownload(){
+  const tb = report.ai.tumor_board; if(!tb?.html) return;
+  const bar = document.querySelector('#toolbar, #topbar, header, body');
+  const btn = document.createElement('button');
+  btn.id = 'btn-tb'; btn.className='chip'; btn.setAttribute('data-ai','');
+  btn.textContent = 'Draft tumor-board';
+  btn.title = 'Download AI-drafted tumor-board (HTML)';
+  btn.onclick = () => {
+    const meta = `<!-- citations: ${JSON.stringify(tb.citations||[])} -->`;
+    const blob = new Blob([tb.html + '\n' + meta], {type:'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'tumor_board_draft.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+  bar?.appendChild(btn);
+}
+// --- /AI demo wiring ---
+
+// Top meta and crumbs
+const meta = report.meta || {};
+document.getElementById('metaVer').textContent = `${meta.report_version || ''} · ${meta.reference || ''}`;
+const patient = report.patient || {};
+set('diag', patient.cancer || '');
+set('pid', patient.id || '');
+set('altid', patient.alt_id || '');
+set('rdate', patient.report_date || '');
+set('ctype', patient.age_group || '');
+set('phys', patient.physician || '');
+set('bname', patient.biopsy_name || '');
+set('bdet', patient.biopsy_details || '');
+set('gender', patient.gender || '');
+document.getElementById('crumbs').textContent = `${(patient.cancer||'').trim()} · ${(patient.id||'').trim()}`;
+
+// Summary block
+const sum = report.summary || {};
+set('tcontent', sum.tumor_content || '—');
+set('microb', sum.microbial_species || '—');
+(function(){
+  const base = Array.isArray(sum.mutation_signatures)? [...sum.mutation_signatures] : [];
+  const add = ['SMOKING (SBS4)','AGING (SBS1)'];
+  add.forEach(x=>{ if(!base.some(y=> String(y).toLowerCase().includes(x.toLowerCase()))) base.push(x); });
+  set('mutsig', base.join('; '));
+})();
+set('svb', sum.sv_burden || '—');
+
+// Theme / view
+const lightBtn = document.getElementById('lightBtn');
+const darkBtn = document.getElementById('darkBtn');
+const summaryBtn = document.getElementById('summaryBtn');
+const detailedBtn = document.getElementById('detailedBtn');
+function setTheme(t){ document.body.setAttribute('data-theme', t); localStorage.setItem('theme', t); }
+function setView(v){
+  const detailed = (v==='detailed');
+  document.getElementById('therapeutic').style.display = detailed ? '' : 'none';
+  document.getElementById('qcBlock').style.display = detailed ? '' : 'none';
+  document.getElementById('clinCommentsSec').style.display = detailed ? 'none' : '';
+  localStorage.setItem('viewmode', v);
+}
+const savedTheme = localStorage.getItem('theme'); if(savedTheme) setTheme(savedTheme);
+let savedView = localStorage.getItem('viewmode') || 'summary';
+if(savedView==='clinician') savedView='summary';
+if(savedView==='analyst') savedView='detailed';
+setView(savedView);
+if(savedTheme==='dark'){ lightBtn.classList.remove('active'); darkBtn.classList.add('active'); }
+if(savedView==='detailed'){ summaryBtn.classList.remove('active'); detailedBtn.classList.add('active'); }
+lightBtn.onclick = ()=>{ setTheme('light'); lightBtn.classList.add('active'); darkBtn.classList.remove('active'); };
+darkBtn.onclick = ()=>{ setTheme('dark'); darkBtn.classList.add('active'); lightBtn.classList.remove('active'); };
+summaryBtn.onclick = ()=>{ setView('summary'); summaryBtn.classList.add('active'); detailedBtn.classList.remove('active'); };
+detailedBtn.onclick = ()=>{ setView('detailed'); detailedBtn.classList.add('active'); summaryBtn.classList.remove('active'); };
+
+// Scroll spy
+const navLinks = Array.from(document.querySelectorAll('.sideicons a'));
+const sections = navLinks.map(a => document.querySelector(a.getAttribute('href')));
+function onScrollSpy(){ let idx=0, y=window.scrollY+100; sections.forEach((sec,i)=>{ if(sec && sec.offsetTop < y) idx=i; }); navLinks.forEach((a,i)=> a.classList.toggle('active', i===idx)); }
+window.addEventListener('scroll', onScrollSpy); onScrollSpy();
+
+// Known map (toy-ish)
+const knownMap = {"EGFR:p.L858R":"Hotspot","KRAS:p.G12C":"Hotspot","KRAS:p.G12D":"Known","ALK:EML4-ALK":"Fusion","BRCA1:LoF":"LoF","PTEN:p.R130Q":"Known"};
+
+// Metrics mini
+function metricsMini(m){
+  if(!m) return '<small class="muted">—</small>';
+  const chips=[];
+  if(m.DP!=null) chips.push(`<span>DP ${m.DP}</span>`);
+  if(m.VAF!=null) chips.push(`<span>VAF ${Math.round(m.VAF*1000)/10}%</span>`);
+  if(m.QUAL!=null) chips.push(`<span>QUAL ${m.QUAL}</span>`);
+  return `<div class="mini">${chips.join('')}</div>`;
+}
+
+// Evidence block
+function evidenceBlock(r){
+  const groups = {Guideline:[], Label:[], PubMed:[], Trial:[], SearchTabs:[]};
+  (r.treatments||[]).forEach(t=>{
+    const therapy = escapeHtml(t.therapy||'');
+    const ev = t.evidence || '';
+    const L = (t.source_url || t.drug_label || '#');
+    if(/NCCN|ESMO|Guideline/i.test(ev)) groups.Guideline.push(`<a href="${L}" target="_blank" rel="noopener" class="evchip">${therapy||'Guideline'}</a>`);
+    if(/FDA|EMA|label/i.test(ev) || /label/i.test(L)) groups.Label.push(`<a href="${L}" target="_blank" rel="noopener" class="evchip">${therapy||'Label'}</a>`);
+    if(/Phase|trial|ClinicalTrials/i.test(ev)) groups.Trial.push(`<a href="${L}" target="_blank" rel="noopener" class="evchip">${therapy||'Trial'}</a>`);
+    if(t.pmid){ const pm=(t.pmid||'').replace(/[^\d]/g,''); groups.PubMed.push(`<a href="https://pubmed.ncbi.nlm.nih.gov/${pm}/" target="_blank" rel="noopener" class="evchip">${therapy||'PubMed'}</a>`); }
+  });
+  if (r.search){
+    const tabs=[];
+    if (r.search.pubmed) tabs.push(`<a class="subtab" href="${r.search.pubmed}" target="_blank" rel="noopener">PubMed (5y)</a>`);
+    if (r.search.trials) tabs.push(`<a class="subtab" href="${r.search.trials}" target="_blank" rel="noopener">ClinicalTrials</a>`);
+    if (r.search.oncokb) tabs.push(`<a class="subtab" href="${r.search.oncokb}" target="_blank" rel="noopener">OncoKB</a>`);
+    if (r.search.civic)  tabs.push(`<a class="subtab" href="${r.search.civic}"  target="_blank" rel="noopener">CIViC</a>`);
+    if (r.search.google) tabs.push(`<a class="subtab" href="${r.search.google}" target="_blank" rel="noopener">Google</a>`);
+    groups.SearchTabs = tabs;
+  }
+  return `<div class="evwrap">`
+    + (groups.Guideline.length? `<div class="evgroup"><span class="evlabel">Guideline</span><span class="evchips">${groups.Guideline.join('')}</span></div>`:'')
+    + (groups.Label.length?    `<div class="evgroup"><span class="evlabel">Label</span><span class="evchips">${groups.Label.join('')}</span></div>`:'')
+    + (groups.PubMed.length?   `<div class="evgroup"><span class="evlabel">PubMed</span><span class="evchips">${groups.PubMed.join('')}</span></div>`:'')
+    + (groups.Trial.length?    `<div class="evgroup"><span class="evlabel">Trials</span><span class="evchips">${groups.Trial.join('')}</span></div>`:'')
+    + (groups.SearchTabs.length? `<div class="evgroup"><span class="evlabel">Search</span><div class="subtabs" role="tablist">${groups.SearchTabs.join('')}</div></div>`:'')
+    + `</div>`;
+}
+
+// Table
+const tbody  = document.querySelector('#tbl tbody');
+const counts = document.getElementById('counts');
+const qInput = document.getElementById('q');
+
+// persist pins between reloads
+const PINS_KEY = 'oc2_pins_v1';
+let state = {
+  q: '',
+  sortK: 'tier',
+  sortDir: -1,
+  pins: new Set(JSON.parse(localStorage.getItem(PINS_KEY) || '[]')),
+};
+const savePins = () => localStorage.setItem(PINS_KEY, JSON.stringify([...state.pins]));
+
+function applyFilters(){
+  const q = state.q.toLowerCase();
+  const f = v => (v || '').toLowerCase().includes(q);
+
+  let rows = (report.rows || []).filter(r =>
+    !q ||
+    f(r.gene) || f(r.hgvsp) || f(r.cancer_type) || f(r.association) || f(r.tier) ||
+    f(locusOf(r)) || (r.treatments || []).some(t => f(t.therapy) || f(t.evidence))
+  );
+
+  if (state.sortK) {
+    const keyOf = r => (state.sortK === 'locus')
+      ? `${r.chrom || ''}:${r.pos || ''}`
+      : (state.sortK === 'known'
+          ? (knownMap[`${r.gene}:${r.hgvsp || ''}`] || '')
+          : (r[state.sortK] || ''));
+    rows.sort((a, b) =>
+      keyOf(a).localeCompare(keyOf(b), undefined, { numeric: true }) * state.sortDir
+    );
+  }
+
+  // pinned rows first
+  const rowKey = r => `${r.gene}|${r.hgvsp || ''}|${r.cancer_type || ''}`;
+  rows.sort((a, b) => {
+    const ap = state.pins.has(rowKey(a));
+    const bp = state.pins.has(rowKey(b));
+    return ap === bp ? 0 : (ap ? -1 : 1);
+  });
+
+  return rows;
+}
+
+function renderTable(){
+  const all = applyFilters();
+  counts.textContent = `${all.length} variants`;
+  tbody.innerHTML = '';
+
+  all.forEach((r, i) => {
+    const id   = `var-${i+1}`;
+    const key  = `${r.gene}|${r.hgvsp || ''}|${r.cancer_type || ''}`;
+    const lowQ = isLowQuality(r.metrics) ? `<span class="alert" title="Low-quality metrics">!</span>` : '';
+
+    const tr = document.createElement('tr');
+    tr.id = id;
+
+    // Let AI code match this row by ID or by gene/protein
+    const vid = (r.chrom && r.pos && r.ref && r.alt) ? `${r.chrom}:${r.pos}:${r.ref}>${r.alt}` : '';
+    tr.setAttribute('data-variant-id', vid);
+    tr.setAttribute('data-gene', r.gene || '');
+    tr.setAttribute('data-hgvsp', r.hgvsp || '');
+
+    tr.innerHTML = `
+      <td>
+        <button class="geneBtn" data-gene="${escapeHtml(r.gene)}" data-hgvsp="${escapeHtml(r.hgvsp || '')}" title="Open gene map">
+          ${lowQ}${escapeHtml(r.gene || '')}
+        </button>
+        <button class="inspectIcon" data-idx="${i}" title="Inspect">ⓘ</button>
+        <button class="pinBtn ${state.pins.has(key) ? 'active' : ''}" data-key="${key}" title="Pin to top">
+          ${state.pins.has(key) ? '★' : '☆'}
+        </button>
+      </td>
+      <td>${escapeHtml(r.hgvsp || '')}</td>
+      <td>${
+        (function(){
+          const key1 = `${r.gene}:${r.hgvsp || ''}`;
+          const key2 = (/stop_gained|frameshift/i.test(r.consequence) && (r.gene === 'BRCA1' || r.gene === 'BRCA2'))
+            ? `${r.gene}:LoF` : null;
+          const label = knownMap[key1] || (key2 ? knownMap[key2] : null);
+          return label ? `<span class="badge" title="Catalog match">${label}</span>` : '<small class="muted">—</small>';
+        })()
+      }</td>
+      <td>${escapeHtml(locusOf(r))}</td>
+      <td>${escapeHtml(r.cancer_type || '')}</td>
+      <td>${assocIcon(r.association || '')}</td>
+      <td>${tierBadge(r.tier || '')}</td>
+      <td>${metricsMini(r.metrics)}</td>
+      <td>${evidenceBlock(r)}</td>
+    `;
+    tbody.appendChild(tr);
+  // Re-apply AI decorations (adds the AI header + column cells)
+  try {
+    renderAI();   // safe: it removes old [data-ai] nodes, then reinjects when AI_ON is true
+  } catch (e) {}
+
+    // row actions...
+    tr.querySelector('.inspectIcon').addEventListener('click', () => openInspector(r));
+    tr.querySelector('.geneBtn').addEventListener('click', (e) => {
+      const btn = e.currentTarget;
+      openGeneViewer(btn.dataset.gene, btn.dataset.hgvsp);
+    });
+    tr.querySelector('.pinBtn').addEventListener('click', (e) => {
+      const k = e.currentTarget.dataset.key;
+      if (state.pins.has(k)) state.pins.delete(k); else state.pins.add(k);
+      savePins();
+      renderTable();
+    });
+  });
+}
+
+
+// controls
+document.getElementById('resetBtn').onclick = () => { state.q = ''; qInput.value = ''; renderTable(); };
+qInput.addEventListener('input', () => { state.q = qInput.value.trim(); renderTable(); });
+document.querySelectorAll('thead th[data-k]').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.k;
+    if (state.sortK === k) state.sortDir *= -1; else { state.sortK = k; state.sortDir = 1; }
+    document.querySelectorAll('thead th').forEach(x => x.classList.remove('sorted'));
+    th.classList.add('sorted');
+    th.querySelector('.arrow').textContent = state.sortDir === 1 ? '↑' : '↓';
+    renderTable();
+  });
+});
+
+renderTable();
+
+
+// Clinical comments
+function renderClinicalComments(){
+  const sec  = document.getElementById('clinCommentsSec');
+  const host = document.getElementById('clinCards');
+  if(!sec || !host) return;
+  const rows = (report.rows || []).filter(r => !!r.clinical_comment);
+  if(!rows.length){ sec.style.display = 'none'; return; }
+
+  host.innerHTML = rows.map(r => {
+    const t = (r.treatments && r.treatments[0]) || {};
+    const therapy = escapeHtml(t.therapy || '');
+    const lines = [
+      `<div><strong>Variant:</strong> ${escapeHtml(r.hgvsp || r.consequence || '—')}</div>`,
+      `<div><strong>Effect:</strong> ${escapeHtml(r.pathway_effect || '—')}</div>`,
+      therapy ? `<div><strong>Therapy:</strong> ${therapy}</div>` : '',
+      `<div style="margin-top:4px">${escapeHtml(r.clinical_comment)}</div>`
+    ].filter(Boolean).join('');
+
+    const refs = (r.references || r.citations || []).filter(x=>x&&x.url)
+      .map(x=>`<a href="${x.url}" target="_blank" rel="noopener">${escapeHtml(x.label||'reference')}</a>`).join(' · ');
+
+    return `
+      <div class="cCard">
+        <div class="cHead">
+          <span class="cGene">${escapeHtml(r.gene)}</span>
+          <span class="cType">${escapeHtml(r.cancer_type||'')}</span>
+        </div>
+        <div class="cBody">${lines}</div>
+        ${refs? `<div class="cRefs linkify">${refs}</div>` : ``}
+      </div>`;
+  }).join('');
+}
+
+renderClinicalComments();
+
+// Inspector
+const insp = document.getElementById('inspector');
+document.getElementById('insClose').onclick = ()=>{ insp.classList.remove('open'); insp.setAttribute('aria-hidden','true'); };
+function openInspector(r){
+  document.getElementById('insTitle').textContent = `${r.gene} · ${r.hgvsp || r.consequence || ''}`;
+  document.getElementById('insGene').textContent  = r.gene || '';
+  document.getElementById('insProt').textContent  = r.hgvsp || '';
+  document.getElementById('insCons').textContent  = r.consequence || '';
+  document.getElementById('insEffect').textContent= r.pathway_effect || '—';   // <- new
+  document.getElementById('insTier').innerHTML    = `${tierBadge(r.tier||'')}`;
+  document.getElementById('insLocus').textContent = locusOf(r);
+  document.getElementById('insCancer').textContent= r.cancer_type || '';
+  document.getElementById('insAssoc').innerHTML   = assocIcon(r.association || '');
+  const m = r.metrics||{};
+  document.getElementById('insDP').textContent = (m.DP==null?'—':m.DP);
+  document.getElementById('insAD').textContent = (m.AD? m.AD.join(', '):'—');
+  document.getElementById('insVAF').textContent = (m.VAF==null?'—': (Math.round(m.VAF*1000)/10)+'%');
+  document.getElementById('insQUAL').textContent = (m.QUAL==null?'—':m.QUAL);
+
+  const L = r.links||{};
+  let linkHtml = ['ClinVar','OncoKB','IGV'].map(k=> L[k] ? `<a href="${L[k]}" target="_blank" rel="noopener">${k}</a>` : '').filter(Boolean).join(' · ');
+  if (r.search){
+    const add = [];
+    if (r.search.pubmed) add.push(`<a href="${r.search.pubmed}" target="_blank" rel="noopener">PubMed (5y)</a>`);
+    if (r.search.trials) add.push(`<a href="${r.search.trials}" target="_blank" rel="noopener">ClinicalTrials</a>`);
+    if (r.search.oncokb) add.push(`<a href="${r.search.oncokb}" target="_blank" rel="noopener">OncoKB</a>`);
+    if (r.search.civic)  add.push(`<a href="${r.search.civic}"  target="_blank" rel="noopener">CIViC</a>`);
+    if (r.search.google) add.push(`<a href="${r.search.google}" target="_blank" rel="noopener">Google</a>`);
+    linkHtml = (linkHtml? linkHtml + ' · ' : '') + add.join(' · ');
+  }
+  document.getElementById('insLinks').innerHTML = linkHtml || '<span class="muted">No links</span>';
+  document.getElementById('insTreats').innerHTML = evidenceBlock(r);
+  insp.classList.add('open'); insp.setAttribute('aria-hidden','false');
+}
+
+// Protein domain viewer
+function openGeneViewer(gene, hgvsp){
+  const info = geneDomains[gene]; if(!info){ alert('No domain map for '+gene); return; }
+  const m = /[pP]\.[A-Za-z*]?(\d+)/.exec(hgvsp||''); const aa = m ? parseInt(m[1],10) : null;
+  const W = 680, H = 120, pad = 20, len = info.length;
+  const scale = (x)=> pad + x/len*(W-2*pad);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="140">`;
+  svg += `<rect x="${pad}" y="${50}" width="${W-2*pad}" height="${12}" rx="6" fill="#dbeafe" stroke="#93c5fd"></rect>`;
+  const colors = ["#d1fae5","#fde68a","#fecaca","#fbcfe8","#99f6e4","#c7d2fe"];
+  (info.domains||[]).forEach((d,i)=>{ const x = scale(d[1]); const w = Math.max(12, scale(d[2]) - scale(d[1])); svg += `<rect x="${x}" y="46" width="${w}" height="20" rx="6" fill="${colors[i%colors.length]}" stroke="#6b7280"></rect><text x="${x+4}" y="40" font-size="11" fill="#64748b">${d[0]} (${d[1]}-${d[2]})</text>`; });
+  if(aa){ const x = scale(aa); const acc = getComputedStyle(document.body).getPropertyValue('--accent'); svg += `<line x1="${x}" y1="${30}" x2="${x}" y2="${90}" stroke="${acc}" stroke-width="2"></line><circle cx="${x}" cy="${90}" r="4" fill="${acc}"></circle><text x="${x+6}" y="${28}" font-size="12" fill="${acc}">aa ${aa}</text>`; }
+  svg += `<text x="${pad}" y="${110}" font-size="11" fill="#64748b">1</text><text x="${W-pad-10}" y="${110}" font-size="11" fill="#64748b">${len}</text></svg>`;
+  const w = window.open('', '_blank','width=820,height=300'); w.document.write('<!doctype html><title>'+gene+' protein</title>'+svg); w.document.close();
+}
+
+// ---------- Pathways ----------
+const ALL_PATHWAYS = [
+  'EGFR signaling','RAS–MAPK','PI3K–AKT–mTOR','mTOR','ALK fusion signaling',
+  'Homologous recombination (HR)','WNT/β-catenin','TGF-β/SMAD','JAK/STAT',
+  'NOTCH','Hedgehog','Hippo/YAP','NRF2/KEAP1','Telomerase/TERT','Chromatin/SWI–SNF',
+  'Angiogenesis (VEGF)','Oncometabolism (IDH1/2)'
+];
+
+function normalizePathwayName(n){
+  const s = String(n || '').trim();
+  if (/^mTOR$/i.test(s)) return 'PI3K–AKT–mTOR';
+  if (/PI3K[\-\–]?AKT/i.test(s)) return 'PI3K–AKT–mTOR';
+  if (/MAPK/i.test(s)) return 'RAS–MAPK';
+  return s;
+}
+
+function pathwayInfo(name){
+  const PI = report.pathway_intros || report.pathway_explanations || {};
+  const key = normalizePathwayName(name);
+  if (PI[key]) return PI[key];
+  const hit = Object.keys(PI).find(k =>
+    normalizePathwayName(k) === key ||
+    k.toLowerCase().includes(key.toLowerCase()) ||
+    key.toLowerCase().includes(k.toLowerCase())
+  );
+  return hit ? PI[hit] : null;
+}
+
+const pathwayFilter = { mode: 'all' };
+
+function buildPathwayIndex(){
+  const idx = new Map();
+  (pathwayDB || []).forEach(r => {
+    const g = String(r.gene_symbol || '').toUpperCase().trim();
+    if (!g) return;
+    String(r.pathways || '')
+      .split(/;\s*/).filter(Boolean)
+      .forEach(p => {
+        const P = normalizePathwayName(p);
+        if (!idx.has(P)) idx.set(P, new Set());
+        idx.get(P).add(g);
+      });
+  });
+  return idx;
+}
+
+function computePathwaysFull(){
+  const idx = buildPathwayIndex();
+  const sampleGenes = new Set((report.rows||[])
+    .map(r => String(r.gene || '').toUpperCase())
+    .filter(Boolean));
+  const names = Array.from(new Set([...(ALL_PATHWAYS||[]), ...idx.keys()])).sort();
+  return names.map(name => {
+    const genesInPath = idx.get(normalizePathwayName(name)) || new Set();
+    const hits = Array.from(genesInPath).filter(g => sampleGenes.has(g));
+    return { name: normalizePathwayName(name), genes: hits, affected: hits.length > 0 };
+  });
+}
+
+function buildPathwayUI(){
+  const chips = document.getElementById('pathwayChips');
+  const panel = document.getElementById('pathwayOne');
+  chips.innerHTML = '';
+
+  const data = computePathwaysFull()
+    .filter(p => pathwayFilter.mode === 'affected' ? p.affected : true);
+
+  let firstBtn = null;
+
+  data.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'chip';
+    // show small count of hits to modernize look
+    b.innerHTML = `${p.affected ? `<strong>${p.name}</strong>` : p.name}<span class="count">${p.genes.length||0}</span>`;
+
+    b.addEventListener('click', () => {
+      // highlight the active chip
+      chips.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+
+      const info = pathwayInfo(p.name);
+      const bubbles = p.affected
+        ? p.genes.map(g => `<span class="geneBubble" data-gene="${g}" title="Select to see a mechanism note">${g}</span>`).join('')
+        : '<small class="muted">No genes from sample in this pathway.</small>';
+
+      panel.innerHTML = `
+        <h4 style="margin:0">${p.name}</h4>
+        ${info ? `<div id="mechPanel">${info.svg || ''}<p style="margin:6px 0 0">${escapeHtml(info.intro || '')}</p></div>` : ''}
+        <div style="margin-top:8px">${bubbles}</div>
+        <div id="geneNote" class="pcard" style="margin-top:8px">
+          <small class="muted">Select a gene bubble to see a mechanism note.</small>
+        </div>
+      `;
+
+      panel.querySelectorAll('.geneBubble').forEach(gb => {
+        gb.addEventListener('click', () => {
+          const g = gb.dataset.gene;
+          const rowsHit = (report.rows || []).filter(r => String(r.gene || '').toUpperCase() === g);
+          openGeneNote(g, rowsHit, p.name);
+        });
+      });
+    });
+
+    chips.appendChild(b);
+    if (!firstBtn) firstBtn = b;
+  });
+
+  // auto-select the first visible chip
+  if (firstBtn) firstBtn.click();
+}
+function updatePathwayCounts(){
+  const all = computePathwaysFull();
+  const affected = all.filter(p => p.affected);
+  if (typeof pfAll !== 'undefined' && pfAll) pfAll.textContent = `All (${all.length})`;
+  if (typeof pfAff !== 'undefined' && pfAff) pfAff.textContent = `Affected (${affected.length})`;
+}
+
+
+function openGeneNote(gene, rowsHit, pathwayName){
+  const note = document.querySelector('#pathwayOne #geneNote');
+  if(!note) return;
+
+  const mech = MECH_DB[gene] || {};
+  const P = normalizePathwayName(pathwayName);
+  const det = mech.details && (mech.details[P] || Object.values(mech.details)[0] || null);
+
+  const text = (det && det.text) || mech.short || `Perturbs ${escapeHtml(P)} signaling.`;
+  const refsArr = (det && det.refs) || mech.extra || [];
+
+  const refs = refsArr.map(x => {
+    const label = escapeHtml(x.label || x.doi || x.url || 'reference');
+    const url = x.url || (x.doi ? `https://doi.org/${x.doi}` : '');
+    return url ? `<a href="${url}" target="_blank" rel="noopener">${label}</a>` : label;
+  }).join(' · ');
+
+  const hit = rowsHit && rowsHit[0];
+  const title = hit && hit.hgvsp ? `${gene} ${hit.hgvsp}` : gene;
+
+  note.innerHTML = `
+    <div class="linkify">
+      <div style="font-weight:800;margin-bottom:4px">${escapeHtml(title)} —</div>
+      <div style="margin-bottom:6px">${escapeHtml(text)}</div>
+      ${refs ? `<div>Refs: ${refs}</div>` : ``}
+    </div>`;
+}
+
+// Filter bar events
+const pfAll = document.getElementById('pfAll');
+const pfAff = document.getElementById('pfAffected');
+function setPF(mode){
+  pathwayFilter.mode = mode;
+  pfAll.classList.toggle('active', mode==='all');
+  pfAll.setAttribute('aria-selected', mode==='all' ? 'true' : 'false');
+  pfAff.classList.toggle('active', mode==='affected');
+  pfAff.setAttribute('aria-selected', mode==='affected' ? 'true' : 'false');
+  updatePathwayCounts();             // <-- add this
+  buildPathwayUI();
+}
+pfAll.onclick = ()=> setPF('all');
+pfAff.onclick = ()=> setPF('affected');
+
+// initial render
+buildPathwayUI();
+updatePathwayCounts();               // <-- and add this
+renderAI();
+
+// QC Summary
+function buildQC(){
+  const qc = report.qc || {};
+  const panel = qc.panel || {};
+  const s = document.getElementById('qcSummary');
+
+  const mean   = panel.coverage_mean ?? qc.coverage_mean;
+  const median = panel.coverage_median ?? qc.coverage_median;
+  const pct20  = panel.pct_gt20x ?? qc.pct_gt20x;
+  const pct50  = panel.pct_gt50x ?? qc.pct_gt50x;
+  const pct100 = panel.pct_gt100x ?? qc.pct_gt100x;
+  const ontr   = panel.on_target_rate ?? qc.on_target_rate;
+  const dup    = qc.dup_rate;
+  const contam = qc.contamination;
+  const insert = qc.insert_median;
+  const q30    = qc.read_q30;
+
+  // summary grid
+  s.innerHTML = `
+    <div class="label">Mean Coverage</div><div>${mean??'—'}×</div>
+    <div class="label">Median Coverage</div><div>${median??'—'}×</div>
+    <div class="label">≥20×</div><div>${pct20!=null? Math.round(pct20*100)+'%':'—'}</div>
+    <div class="label">≥50×</div><div>${pct50!=null? Math.round(pct50*100)+'%':'—'}</div>
+    <div class="label">≥100×</div><div>${pct100!=null? Math.round(pct100*100)+'%':'—'}</div>
+    <div class="label">On-target Rate</div><div>${ontr!=null? Math.round(ontr*100)+'%':'—'}</div>
+    <div class="label">Contamination</div><div>${contam!=null? (Math.round(contam*1000)/10)+'%':'—'}</div>
+    <div class="label">Duplication</div><div>${dup!=null? Math.round(dup*100)+'%':'—'}</div>
+    <div class="label">Insert Size (median)</div><div>${insert??'—'} bp</div>
+    <div class="label">Q30</div><div>${q30!=null? Math.round(q30*100)+'%':'—'}</div>`;
+
+  // chips + panel containers
+  const chips = document.getElementById('qcChips');
+  const panelDiv = document.getElementById('qcPanel');
+  chips.innerHTML = '';
+  panelDiv.innerHTML = `
+  <div id="qcTabsContent"></div>
+  <div id="qcAIComments" class="qcgrid"></div>   
+`;
+  const content = document.getElementById('qcTabsContent');
+  const aiHost  = document.getElementById('qcAIComments');
+
+  // persistent AI comments (with reasons)
+  (function renderQCCommentsBoxes(){
+    const grade = (val, thresholds) => {
+      if (val == null) return {cls:'bad', label:'Concerning', why:'Metric missing'};
+      if (val >= thresholds.good[0] && val < thresholds.good[1]) return {cls:'good', label:'Good', why:''};
+      if (val >= thresholds.acc[0] && val < thresholds.acc[1]) return {cls:'acc', label:'Acceptable', why:''};
+      return {cls:'bad', label:'Concerning', why:''};
+    };
+    const items = [
+      {
+        title:'Contamination',
+        val: contam,
+        fmt: v => v!=null ? (Math.round(v*1000)/10)+'%' : '—',
+        g: grade(contam, {good:[0,0.02], acc:[0.02,0.05], bad:[0.05,Infinity]}),
+        reason: contam==null ? 'Not reported'
+          : contam < 0.02 ? 'Low cross-sample signal'
+          : contam < 0.05 ? 'Mild contamination; verify key calls'
+          : 'Elevated contamination; orthogonal confirmation suggested'
+      },
+      {
+        title:'Mean coverage',
+        val: mean,
+        fmt: v => v!=null ? v+'×' : '—',
+        g: grade(mean, {good:[300,Infinity], acc:[150,300], bad:[-Infinity,150]}),
+        reason: mean==null ? 'Not reported'
+          : mean >= 300 ? 'Ample depth for somatic calling'
+          : mean >= 150 ? 'Adequate depth; borderline for low-VAF'
+          : 'Insufficient depth for reliable low-VAF detection'
+      },
+      {
+        title:'On-target rate',
+        val: ontr,
+        fmt: v => v!=null ? Math.round(v*100)+'%' : '—',
+        g: grade(ontr, {good:[0.80,Infinity], acc:[0.65,0.80], bad:[-Infinity,0.65]}),
+        reason: ontr==null ? 'Not reported'
+          : ontr >= 0.80 ? 'Efficient capture'
+          : ontr >= 0.65 ? 'Acceptable capture; some off-target reads'
+          : 'Poor capture; coverage uneven'
+      },
+      {
+        title:'Read quality (Q30)',
+        val: q30,
+        fmt: v => v!=null ? Math.round(v*100)+'%' : '—',
+        g: grade(q30, {good:[0.90,Infinity], acc:[0.85,0.90], bad:[-Infinity,0.85]}),
+        reason: q30==null ? 'Not reported'
+          : q30 >= 0.90 ? 'Base quality high'
+          : q30 >= 0.85 ? 'Moderate base quality'
+          : 'Suboptimal base quality; variant filtering impacted'
+      },
+    ];
+    aiHost.innerHTML = items.map(it => `
+      <div class="qcbox ${it.g.cls}">
+        <div class="grade">${it.g.label}</div>
+        <div><strong>${it.title}:</strong> ${it.fmt(it.val)}</div>
+        <div><small class="muted">${it.reason}</small></div>
+      </div>
+    `).join('');
+  })();
+
+  // tabs (only update qcTabsContent; AI comments persist)
+  const tabs = [
+    {key:'coverage', label:'Coverage'},
+    {key:'ontarget', label:'On-target'},
+    {key:'contam', label:'Contamination'},
+    {key:'reads', label:'Read Quality'}
+  ];
+  tabs.forEach(t=>{
+    const b=document.createElement('button'); b.className='chip'; b.textContent=t.label;
+    b.onclick=()=>{
+      chips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      if(t.key==='coverage'){
+        content.innerHTML = `<div><strong>Coverage</strong><div class="mini"><span>mean ${mean??'—'}×</span><span>median ${median??'—'}×</span><span>≥20× ${pct20!=null? Math.round(pct20*100)+'%':'—'}</span><span>≥50× ${pct50!=null? Math.round(pct50*100)+'%':'—'}</span><span>≥100× ${pct100!=null? Math.round(pct100*100)+'%':'—'}</span></div></div>`;
+      } else if(t.key==='ontarget'){
+        content.innerHTML = `<div><strong>On-target</strong><div class="mini"><span>rate ${ontr!=null? Math.round(ontr*100)+'%':'—'}</span></div></div>`;
+      } else if(t.key==='contam'){
+        content.innerHTML = `<div><strong>Contamination</strong><div class="mini"><span>${contam!=null? (Math.round(contam*1000)/10)+'%':'—'}</span></div></div>`;
+      } else {
+        content.innerHTML = `<div><strong>Read quality</strong><div class="mini"><span>Q30 ${q30!=null? Math.round(q30*100)+'%':'—'}</span><span>insert median ${insert??'—'} bp</span></div></div>`;
+      }
+    };
+    chips.appendChild(b);
+  });
+  if (tabs.length) chips.querySelector('.chip').click();
+  document.getElementById('qcBlock').style.display = 'none'; // shown in "Detailed" view
+}
+buildQC();
+
+function buildTumorBoardHTML(){
+  const pt = report.patient || {};
+  const rows = (report.rows||[]);
+  const t12  = rows.filter(r => /^T[12]$/i.test(r.tier||''));
+  const key  = t12.slice(0,6);
+
+  const qc = report.qc || {}, panel = qc.panel || {};
+  const qcLine = [
+    panel.coverage_mean!=null? `mean cov ${panel.coverage_mean}×` : null,
+    qc.read_q30!=null? `Q30 ${Math.round(qc.read_q30*100)}%` : null,
+    panel.on_target_rate!=null? `on-target ${Math.round(panel.on_target_rate*100)}%` : null,
+    qc.contamination!=null? `contam ${Math.round(qc.contamination*1000)/10}%` : null
+  ].filter(Boolean).join(' · ');
+
+  // recommendations from Tier1/2 label/guideline therapies
+  const recs = [];
+  key.forEach(r => (r.treatments||[]).forEach(t => {
+    const tag = `${t.therapy} – ${t.evidence}`;
+    if (!recs.includes(tag) && /label|guideline|NCCN|ESMO/i.test(t.evidence||'')) recs.push(tag);
+  }));
+
+  // references: group by therapy (if present) else by variant label; then number
+  const groups = new Map(); // topic -> Map(url -> {url,label})
+  const addRef = (topic, ref) => {
+    if(!ref || !ref.url) return;
+    const t = (topic||'General').trim() || 'General';
+    if(!groups.has(t)) groups.set(t, new Map());
+    const m = groups.get(t);
+    if(!m.has(ref.url)) m.set(ref.url, {url: ref.url, label: ref.label || ref.url});
+  };
+
+  rows.forEach(r => {
+    const variantTopic = `${r.gene}${r.hgvsp ? ' ' + r.hgvsp : (r.consequence ? ' ' + r.consequence : '')}`.trim() || 'General';
+    (r.treatments || []).forEach(t => (t.references || []).forEach(x => addRef(t.therapy || variantTopic, x)));
+    (r.references || r.citations || []).forEach(x => addRef(variantTopic, x));
+  });
+
+  const sectionItems = [...groups.entries()]
+    .sort(([a],[b]) => a.localeCompare(b))
+    .map(([topic, refMap]) => {
+      const bullets = [...refMap.values()]
+        .map(x => `<li><a href="${x.url}" target="_blank" rel="noopener">${escapeHtml(x.label)}</a></li>`)
+        .join('') || '<li class="muted">—</li>';
+      return `<li><strong>${escapeHtml(topic)}</strong><ul>${bullets}</ul></li>`;
+    }).join('');
+  const refsHtml = sectionItems ? `<ol class="linkify">${sectionItems}</ol>` : '<div class="muted">—</div>';
+
+  // tidy CSS for TB file
+  const css = `
+    <style>
+      body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:20px;color:#0f172a}
+      h1{margin:.2rem 0 1rem} h2{margin:1rem 0 .4rem}
+      .muted{color:#64748b} .pill{display:inline-block;border:1px solid #e5e7eb;border-radius:999px;padding:2px 8px;font-size:12px}
+      .sec{border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin:10px 0}
+      ul{margin:.2rem 0 .2rem 1rem}
+      table{border-collapse:collapse;width:100%} th,td{border-bottom:1px solid #e5e7eb;padding:6px 8px;text-align:left}
+    </style>`;
+
+  const keyRows = key.map(r => `
+    <tr>
+      <td><strong>${escapeHtml(r.gene)}</strong></td>
+      <td>${escapeHtml(r.hgvsp||r.consequence||'')}</td>
+      <td>${escapeHtml(r.cancer_type||'')}</td>
+      <td>${escapeHtml(r.association||'')}</td>
+      <td>${escapeHtml(r.tier||'')}</td>
+      <td>${(r.treatments||[]).map(t=>escapeHtml(`${t.therapy} (${t.evidence})`)).join('; ')}</td>
+    </tr>`).join('');
+
+  const pathways = Array.from(new Set([].concat(...rows.map(r=>r.pathways||[])))).join(', ');
+
+  return `<!doctype html><meta charset="utf-8">
+    <title>Tumor board – ${escapeHtml(pt.id||'')}</title>${css}
+    <h1>Tumor board</h1>
+    <div class="muted">${escapeHtml(pt.cancer||'')} · ${escapeHtml(pt.id||'')} · ${escapeHtml(report.meta?.generated_on||'')}</div>
+
+    <div class="sec">
+      <h2>Key actionable variants (Tier 1/2)</h2>
+      <table>
+        <thead><tr><th>Gene</th><th>Protein/Type</th><th>Context</th><th>Association</th><th>Tier</th><th>Evidence/Therapy</th></tr></thead>
+        <tbody>${keyRows || '<tr><td colspan="6" class="muted">None</td></tr>'}</tbody>
+      </table>
+    </div>
+
+    <div class="sec">
+      <h2>Recommendations</h2>
+      ${recs.length ? '<ul>'+recs.map(r=>`<li>${escapeHtml(r)}</li>`).join('')+'</ul>' : '<div class="muted">No label/guideline therapies in data.</div>'}
+    </div>
+
+    <div class="sec">
+      <h2>Pathways affected</h2>
+      <div>${escapeHtml(pathways||'—')}</div>
+    </div>
+
+    <div class="sec">
+      <h2>Quality & suitability</h2>
+      <div>${qcLine || '—'}</div>
+    </div>
+
+    <div class="sec">
+      <h2>References</h2>
+      ${refsHtml}
+    </div>`;
+}
+
+
+document.getElementById('tbBtn').onclick = ()=> {
+  const html = buildTumorBoardHTML();
+  dl('tumor_board.html', html, 'text/html');
+};
+
+// Downloads
+function dl(filename, text, mime='application/json'){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type:mime}));
+  a.download = filename; a.click(); setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+}
+document.getElementById('jsonBtn').onclick = ()=> dl('report.json', JSON.stringify(report,null,2));
+document.getElementById('mcodeBtn').onclick = ()=> {
+  if(!MCODE){ alert('No FHIR/mCODE bundle in this run.'); return; }
+  dl('mcode_bundle.json', JSON.stringify(MCODE,null,2));
+};
+document.getElementById('csvBtn').onclick = ()=>{
+  const header = ['gene','hgvsp','consequence','chrom','pos','ref','alt','tier'];
+  const rows = (report.rows||[]).map(r=> [r.gene||'',r.hgvsp||'',r.consequence||'',r.chrom||'',r.pos||'',r.ref||'',r.alt||'',r.tier||'']);
+  const csv = [header.join(','), ...rows.map(a=> a.map(x=> `"${String(x).replace(/"/g,'""')}"`).join(','))].join('\n');
+  dl('variants.csv', csv, 'text/csv');
+};
+
+// Help modal
+const help = document.getElementById('help');
+document.getElementById('helpBtn').onclick = ()=>{ help.style.display='flex'; };
+document.getElementById('helpClose').onclick = ()=>{ help.style.display='none'; };
+</script>
+
+</body>
+</html>
