@@ -39,20 +39,24 @@ Configurable thresholds for variant calling, local drug availability, and report
 ## Demo Video
 ▶️ Watch the demo here: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4)
 
-[![Demo Preview](https://i.ytimg.com/vi/jQRYuFybSV4/hqdefault.jpg)](https://www.youtube.com/watch?v=jQRYuFybSV4 "Watch the demo on YouTube")
 
-<p style="text-align:center">
+<p align="center">
   <a href="https://www.youtube.com/watch?v=jQRYuFybSV4" target="_blank" rel="noopener noreferrer" aria-label="Watch the demo on YouTube">
-    <img
-      src="https://i.ytimg.com/vi/jQRYuFybSV4/hqdefault.jpg"
-      alt="OpenCARE demo preview"
-      width="600"
-      loading="lazy"
-      decoding="async"
-      referrerpolicy="no-referrer"
-    />
+    <picture>
+      <source srcset="https://i.ytimg.com/vi_webp/jQRYuFybSV4/maxresdefault.webp" type="image/webp">
+      <source srcset="https://i.ytimg.com/vi_webp/jQRYuFybSV4/hqdefault.webp" type="image/webp">
+      <source srcset="https://img.youtube.com/vi/jQRYuFybSV4/maxresdefault.jpg" type="image/jpeg">
+      <img
+        src="https://img.youtube.com/vi/jQRYuFybSV4/hqdefault.jpg"
+        alt="OpenCARE demo preview"
+        width="600"
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
   </a>
 </p>
+
 
 
 ## Demo
