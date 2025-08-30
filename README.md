@@ -37,7 +37,9 @@ Configurable thresholds for variant calling, local drug availability, and report
 ![Workflow Diagram](assets/OpenCare%20Workflow%20diagram.jpg)
 
 ## Demo Video
-▶️ Watch the demo here: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4))
+▶️ Watch the demo here: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4)
+
+[![Demo Preview](https://i.ytimg.com/vi/jQRYuFybSV4/hqdefault.jpg)](https://www.youtube.com/watch?v=jQRYuFybSV4 "Watch the demo on YouTube")
 
 <p style="text-align:center">
   <a href="https://www.youtube.com/watch?v=jQRYuFybSV4" target="_blank" rel="noopener noreferrer" aria-label="Watch the demo on YouTube">
