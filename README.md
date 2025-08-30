@@ -41,7 +41,7 @@ Configurable thresholds for variant calling, local drug availability, and report
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=jQRYuFybSV4">
-    <img src="https://img.youtube.com/vi/watch?v=jQRYuFybSV4/0.jpg" alt="Demo Preview" width="600"/>
+    <img src="https://img.youtube.com/watch?v=jQRYuFybSV4/0.jpg" alt="Demo Preview" width="600"/>
   </a>
 </p>
 
