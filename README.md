@@ -73,9 +73,10 @@ Docker
 Access to relevant reference data (e.g., GRCh38, GTF, gnomAD, ClinVar)
 
 ## Setup
+```bash
 git clone https://github.com/AhmedHassan-bioinfo/OpenCare
-cd opencare
-
+cd OpenCare
+```
 ## Usage (works for any sample)
 
 > **Tip:** Nextflow groups read pairs by the shared prefix before `{1,2}` (or `_R{1,2}`), so keep your files named like `SAMPLE_1.fastq.gz` / `SAMPLE_2.fastq.gz` or `SAMPLE_R1.fastq.gz` / `SAMPLE_R2.fastq.gz`.
