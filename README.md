@@ -39,11 +39,19 @@ Configurable thresholds for variant calling, local drug availability, and report
 ## Demo Video
 ▶️ Watch the demo here: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4))
 
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=jQRYuFybSV4">
-    <img src="https://img.youtube.com/watch?v=jQRYuFybSV4/0.jpg" alt="Demo Preview" width="600"/>
+<p style="text-align:center">
+  <a href="https://www.youtube.com/watch?v=jQRYuFybSV4" target="_blank" rel="noopener noreferrer" aria-label="Watch the demo on YouTube">
+    <img
+      src="https://i.ytimg.com/vi/jQRYuFybSV4/hqdefault.jpg"
+      alt="OpenCARE demo preview"
+      width="600"
+      loading="lazy"
+      decoding="async"
+      referrerpolicy="no-referrer"
+    />
   </a>
 </p>
+
 
 ## Demo
 
