@@ -47,7 +47,7 @@ Configurable thresholds for variant calling, local drug availability, and report
 
 ## Demo
 
-🔗 [OpenCARE Demo (HTML)](assets/OpenCARE_demo.html)
+🔗 [OpenCARE Demo (HTML)](docs/OpenCARE_demo.html)
 
 
 
