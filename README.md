@@ -32,6 +32,9 @@ Institutional customization
 
 Configurable thresholds for variant calling, local drug availability, and reporting cut-offs.
 
+## Workflow
+![Workflow Diagram](assets/workflow_diagram.png)
+
 ## Reproducibility
 
 Built on Nextflow DSL2 for portability and scalability.
