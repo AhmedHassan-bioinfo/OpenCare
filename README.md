@@ -1,6 +1,5 @@
 OpenCare: Open-Source Clinical Genomics Decision Support Platform
 
-![OpenCARE Logo](assets/OpenCare_logo.jpg)
 <p align="center">
   <img src="assets/OpenCare_logo.jpg" alt="OpenCARE Logo" width="250"/>
 </p>
