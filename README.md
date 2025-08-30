@@ -1,6 +1,8 @@
 OpenCare: Open-Source Clinical Genomics Decision Support Platform
 
 ![OpenCARE Logo](assets/OpenCare_logo.jpg)
+
+
 Introduction
 
 OpenCare is an open-source, vendor-agnostic clinical genomics decision support (CDS) tool.
