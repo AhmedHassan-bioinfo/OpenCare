@@ -49,7 +49,7 @@ Open-source and extensible
 Modular design allows integration of new variant callers, annotation sources, or reporting templates.
 
 ## Project Structure
-OpenCare_project/
+<pre> ```OpenCare_project/
 ├── workflows/        # Nextflow main.nf and workflow definitions
 ├── modules/          # Modular processes (alignment, variant calling, annotation, reporting)
 ├── config/           # Configuration profiles (resources, Docker/Singularity, HPC settings)
@@ -58,7 +58,7 @@ OpenCare_project/
 ├── results/          # Output directory (reports, VCFs, BAMs, FHIR bundles)
 ├── OC_work/          # Project-specific Nextflow work directory
 ├── logs/             # Execution logs and traces
-└── docs/             # Documentation, protocols, and references
+└── docs/             # Documentation, protocols, and references``` </pre>
 
 ## Installation
 Requirements
