@@ -33,7 +33,7 @@ Institutional customization
 Configurable thresholds for variant calling, local drug availability, and reporting cut-offs.
 
 ## Workflow
-![Workflow Diagram](assets/OpenCare_Workflow_Diagram.jpg)
+![Workflow Diagram](assets/OpenCare%20Workflow%20diagram.jpg)
 
 ## Reproducibility
 
