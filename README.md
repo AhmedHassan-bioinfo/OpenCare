@@ -1,4 +1,6 @@
 OpenCare: Open-Source Clinical Genomics Decision Support Platform
+
+![OpenCARE Logo](assets/OpenCare_logo.jpg)
 Introduction
 
 OpenCare is an open-source, vendor-agnostic clinical genomics decision support (CDS) tool.
@@ -117,6 +119,8 @@ Execution Metadata
 
 Nextflow trace files, resource usage, and provenance records.
 
+Tumour board file for tumor board discussions.
+
 ## Data Sources
 
 Oncology: CIViC, OncoKB (research license), ClinVar, ClinGen
@@ -129,7 +133,7 @@ Pathogen resistance: CARD, ResFinder
 
 Population references: gnomAD, 1000 Genomes, TCGA, GENIE
 
-## Validation and Benchmarking
+## Future Validation and Benchmarking
 
 Cross-validation against retrospective clinical cohorts (~200 cases).
 
@@ -151,13 +155,15 @@ Institutional customization is necessary for clinical deployment.
 
 ## Roadmap
 
-Integration of machine-learning classifiers for CHIP artifact reduction.
+Integration of machine-learning classifiers .
 
 Automated clinical trial matching via ClinicalTrials.gov.
 
-Development of a web-based dashboard (R Shiny or Plotly Dash).
-
 Extension to multi-omics integration (RNA-seq, proteomics, methylation).
+
+### Disclaimers
+- All dates are targets; scope may shift if validation fails quality gates.
+
 
 ## Contributing
 
