@@ -40,7 +40,7 @@ Configurable thresholds for variant calling, local drug availability, and report
 ▶️ Watch the demo here: [Demo Video on YouTube](https://youtu.be/ubciuaTrkik)
 
 <p align="center">
-  <a href="https://youtu.be/your-demo-link">
+  <a href="https://www.youtube.com/watch?v=ubciuaTrkik">
     <img src="assets/demo_preview.png" alt="Demo Preview" width="600"/>
   </a>
 </p>
