@@ -34,7 +34,7 @@ The tool emphasizes reproducibility, transparency, and institutional adaptabilit
 ![Workflow Diagram](assets/OpenCare%20Workflow%20diagram.jpg)
 
 ## Prototype Video
-▶️ Watch the demo here: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4)
+▶️ Watch the prototype here: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4)
 
 
 <p align="center">
@@ -56,7 +56,7 @@ The tool emphasizes reproducibility, transparency, and institutional adaptabilit
 
 
 
-## Prototype
+## Give it a try
 
 🔗 [OpenCARE Demo (HTML)](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)
 
