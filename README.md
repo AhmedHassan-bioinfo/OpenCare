@@ -82,6 +82,8 @@ The tool emphasizes reproducibility, transparency, and institutional adaptabilit
 ├── work/ # Nextflow work directory (on Linux FS)
 ├── logs/ # Execution logs and traces
 └── docs/ # Documentation and protocols
+</pre>
+
 
 
 > **WSL2/Windows note:** keep **project, `work/`, and `results/` on Linux (ext4)** for locking and performance. Treat `E:`/`D:` mounts as read-only inputs whenever possible.
