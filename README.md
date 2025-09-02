@@ -144,7 +144,7 @@ nextflow run workflows/clinical_core.nf \
   -w "$HOME/nxf_work" \
   -profile docker
 
-
+(WIP)
 Pharmacogenomics (PGx) VCF
 nextflow run workflows/clinical_core.nf \
   --vcf '/path/to/pgx/<SAMPLE_ID>.vcf.gz' \
@@ -153,7 +153,7 @@ nextflow run workflows/clinical_core.nf \
   -w "$HOME/nxf_work" \
   -profile docker
 
-
+(Planned)
 Infectious Disease (Pathogen Resistance)
 nextflow run workflows/clinical_core.nf \
   --reads  '/path/to/microbes/<SAMPLE_ID>_{1,2}.fastq.gz' \
