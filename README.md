@@ -11,27 +11,24 @@ It is designed to process next-generation sequencing (NGS) data across multiple 
 
 The tool emphasizes reproducibility, transparency, and institutional adaptability. It supports both research and clinical contexts.
 
+
+
 ## Features
 
-Cross-domain applicability
+### Cross-domain applicability
+- **Oncology:** somatic & germline variant tiering (AMP/ESMO/ESCAT).
+- **Pharmacogenomics:** drug–gene interactions and dosing (CPIC, PharmGKB).
+- **Inherited disease:** ACMG/ClinGen classification framework.
+- **Infectious disease:** pathogen typing & AMR prediction (CARD, ResFinder).
 
-Oncology: somatic and germline variant tiering (AMP/ESMO/ESCAT guidelines).
+### Standards-based reporting
+- Human-readable **interactive HTML** reports for tumor boards.
+- Structured outputs: **HL7 FHIR Genomics** and **mCODE** JSON bundles.
 
-Pharmacogenomics: drug–gene interaction and dose adjustment (CPIC, PharmGKB).
+### Institutional customization
+- Configurable thresholds for variant calling, reporting cut-offs, and local drug availability.
 
-Inherited disease: ACMG/ClinGen classification framework.
 
-Infectious disease: pathogen typing and antimicrobial resistance prediction (CARD, ResFinder).
-
-Standards-based reporting
-
-Human-readable HTML reports designed for tumor boards and clinical decision meetings.
-
-Structured outputs conforming to HL7 FHIR Genomics and mCODE implementation guides.
-
-Institutional customization
-
-Configurable thresholds for variant calling, local drug availability, and reporting cut-offs.
 
 ## Workflow
 ![Workflow Diagram](assets/OpenCare%20Workflow%20diagram.jpg)
@@ -66,155 +63,171 @@ Configurable thresholds for variant calling, local drug availability, and report
 
 
 ## Reproducibility
+- Built on **Nextflow DSL2** for portability and scalability.
+- **Containerized** execution (Docker/Singularity/Podman).
+- Compatible with HPC and cloud.
 
-Built on Nextflow DSL2 for portability and scalability.
+## Open-source and extensible
+- Modular design for swapping in new callers, annotations, or reporting templates.
 
-Containerized execution (Docker/Singularity/Podman).
-
-Compatible with HPC and cloud environments.
-
-Open-source and extensible
-
-Modular design allows integration of new variant callers, annotation sources, or reporting templates.
-
+  
 ## Project Structure
 <pre> OpenCare_project/
-├── workflows/        # Nextflow main.nf and workflow definitions
-├── modules/          # Modular processes (alignment, variant calling, annotation, reporting)
-├── config/           # Configuration profiles (resources, Docker/Singularity, HPC settings)
-├── references/       # Reference genomes, annotations, knowledgebase snapshots
-├── test_data/        # Toy FASTQ/VCF datasets for validation
-├── results/          # Output directory (reports, VCFs, BAMs, FHIR bundles)
-├── OC_work/          # Project-specific Nextflow work directory
-├── logs/             # Execution logs and traces
-└── docs/             # Documentation, protocols, and references </pre>
+├── workflows/ # DSL2 workflows (clinical_core.nf, etc.)
+├── modules/ # Processes (alignment, calling, VEP, reporting)
+├── config/ # Profiles and resource settings
+├── references/ # Reference genomes, annotations, KB snapshots
+├── test_data/ # Toy FASTQ/VCF for validation
+├── results/ # Reports, VCFs, BAMs, FHIR/mCODE bundles
+├── work/ # Nextflow work directory (on Linux FS)
+├── logs/ # Execution logs and traces
+└── docs/ # Documentation and protocols
+
+
+> **WSL2/Windows note:** keep **project, `work/`, and `results/` on Linux (ext4)** for locking and performance. Treat `E:`/`D:` mounts as read-only inputs whenever possible.
 
 ## Installation
-Requirements
+  
+**Requirements**
+- Nextflow ≥ 23
+- Java 11 or 17
+- Docker (or Singularity)
+- Access to reference data (e.g., GRCh38, GTF, gnomAD, ClinVar)
+- Optional: VEP cache for offline annotation
 
-Nextflow ≥23
 
-Java 11 or 17
 
-Docker
- or Singularity
-
-Access to relevant reference data (e.g., GRCh38, GTF, gnomAD, ClinVar)
 
 ## Setup
 ```bash
 git clone https://github.com/AhmedHassan-bioinfo/OpenCare
 cd OpenCare
 ```
+
+  
+##Configuration (important on WSL2/Windows)
+Set the Nextflow work dir to Linux FS:
+```bash
+nextflow run workflows/clinical_core.nf -w "$HOME/nxf_work"  -profile docker
+```
+Use a Linux path for outputs, e.g. --outdir "$HOME/OpenCare_out".
+
+If inputs live on Windows mounts (e.g., /mnt/e/...), use them as read-only. Avoid publishing to /mnt/e to prevent I/O/file-lock errors.
+
+Stage-in is configured to use symlinks (or copy) to avoid cross-device hard-link issues.
+
+VEP cache inside Docker
+
+Bind your cache read-only (example):
+```bash
+docker.runOptions = '-v /mnt/d/vep_cache:/vep_cache:ro --tmpfs /tmp:exec'
+params.vep_cache  = '/vep_cache'
+```
+
+
+
+  
 ## Usage (works for any sample)
 
 > **Tip:** Nextflow groups read pairs by the shared prefix before `{1,2}` (or `_R{1,2}`), so keep your files named like `SAMPLE_1.fastq.gz` / `SAMPLE_2.fastq.gz` or `SAMPLE_R1.fastq.gz` / `SAMPLE_R2.fastq.gz`.
 
-### Whole-Genome Sequencing (Tumor/Normal)
+### Whole-Genome Sequencing 
 
-**Single sample (replace placeholders):**
+**Tumor-only WGS (single sample) (replace placeholders):**
 
-nextflow run workflows/main.nf \
-  --reads   'data/wgs/tumor/<TUMOR_ID>_{1,2}.fastq.gz' \
-  --normal  'data/wgs/normal/<NORMAL_ID>_{1,2}.fastq.gz' \
-  --ref_fa  references/hg38.fa \
-  --sample  <CASE_ID> \
-  --outdir  results/<CASE_ID> \
+nextflow run workflows/clinical_core.nf \
+  --reads  '/path/to/tumor/<SAMPLE_ID>_{1,2}.fastq.gz' \
+  --ref_fa '/path/to/refs/hg38.fa' \
+  --outdir "$HOME/OpenCare_out/<SAMPLE_ID>" \
+  -w "$HOME/nxf_work" \
   -profile docker
 
-Pharmacogenomics (PGx) Panel
-nextflow run workflows/main.nf \
-  --vcf 'data/pgx/<SAMPLE_ID>.vcf.gz' \
+
+Pharmacogenomics (PGx) VCF
+nextflow run workflows/clinical_core.nf \
+  --vcf '/path/to/pgx/<SAMPLE_ID>.vcf.gz' \
   --pgx true \
-  --outdir results/pgx_case \
+  --outdir "$HOME/OpenCare_out/pgx_<SAMPLE_ID>" \
+  -w "$HOME/nxf_work" \
   -profile docker
+
 
 Infectious Disease (Pathogen Resistance)
-nextflow run workflows/main.nf \
-  --reads 'data/microbes/<SAMPLE_ID>_{1,2}.fastq.gz' \
-  --ref_fa references/<SPECIES>.fa \
-  --sample  <SAMPLE_ID> \
-  --outdir  results/microbes/<SAMPLE_ID> \
+nextflow run workflows/clinical_core.nf \
+  --reads  '/path/to/microbes/<SAMPLE_ID>_{1,2}.fastq.gz' \
+  --ref_fa '/path/to/microbes/<SPECIES>.fa' \
+  --outdir "$HOME/OpenCare_out/micro_<SAMPLE_ID>" \
+  -w "$HOME/nxf_work" \
   -profile docker
+
 
 ## Outputs
 
-Reports
+Reports: interactive HTML (variant table, filters, clickable evidence).
 
-HTML interactive reports summarizing clinically relevant variants.
+Structured data: HL7 FHIR Genomics + mCODE JSON bundles.
 
-Structured Data
+Intermediate files: BAM/BAI, (VEP-)VCF/VCF.TBI, QC metrics.
 
-HL7 FHIR Genomics and mCODE JSON bundles for EMR integration.
+Execution metadata: Nextflow traces, logs, provenance.
 
-Intermediate Files
-
-BAM files, VCFs, QC metrics, and log files for auditing and validation.
-
-Execution Metadata
-
-Nextflow trace files, resource usage, and provenance records.
-
-Tumour board file for tumor board discussions.
+    
 
 ## Data Sources
 
 Oncology: CIViC, OncoKB (research license), ClinVar, ClinGen
 
-Pharmacogenomics: PharmGKB, CPIC guidelines
+Pharmacogenomics: PharmGKB, CPIC
 
-Inherited disease: ClinVar, ACMG/AMP classification criteria
+Inherited disease: ClinVar, ACMG/AMP criteria
 
 Pathogen resistance: CARD, ResFinder
 
-Population references: gnomAD, 1000 Genomes, TCGA, GENIE
+Population refs: gnomAD, 1000 Genomes, TCGA, GENIE
 
-## Future Validation and Benchmarking
+    
 
-Cross-validation against retrospective clinical cohorts (~200 cases).
+## Validation & Benchmarking (planned)
 
-Concordance assessment with vendor pipelines (e.g., Qiagen QCI, Illumina Connected Insights, SOPHiA DDM).
+Cross-validation on retrospective cohorts (~200 cases).
 
-EMR integration validated with FHIR Genomics Implementation Guide validators.
+Concordance vs. vendor pipelines (Qiagen QCI, Illumina CI, SOPHiA DDM).
 
-Performance metrics: precision, recall, concordance for Tier I/II oncology calls, PGx phenotypes, and infectious resistance predictions.
+EMR integration checks with FHIR Genomics validators.
 
+Metrics: precision/recall, concordance for Tier I/II oncology, PGx phenotypes, AMR.
+
+    
 ## Limitations
 
-Knowledgebase coverage varies across disease areas.
+Knowledgebase coverage varies by disease area.
 
-Panel/WES/WGS harmonization requires calibration for TMB/MSI.
+Harmonizing panel/WES/WGS requires calibration (e.g., TMB/MSI).
 
-CHIP artifacts may confound liquid biopsy results; recommended filtering strategies are provided.
+CHIP can confound liquid biopsy; filtering strategies recommended.
 
-Institutional customization is necessary for clinical deployment.
+Institutional customization required for clinical deployment.
 
 ## Roadmap
 
-Integration of machine-learning classifiers .
+ML classifiers for prioritization.
 
-Automated clinical trial matching via ClinicalTrials.gov.
+ClinicalTrials.gov trial matching.
 
-Extension to multi-omics integration (RNA-seq, proteomics, methylation).
+Multi-omics extensions (RNA-seq, proteomics, methylation).
 
 ### Disclaimers
 - All dates are targets; scope may shift if validation fails quality gates.
 
 
 ## Contributing
-
-Contributions are welcome. Please see the CONTRIBUTING.md
- for coding standards, module templates, and review process.
+Contributions welcome—see CONTRIBUTING.md for coding standards and review.
 
 ## License
-
-This project is licensed under the Apache License 2.0
-.
+Apache License 2.0
 
 ## Citation
 
 If you use OpenCare in your work, please cite:
 
-Ahmed Hassan  
-OpenCare: An Open-Source, Vendor-Agnostic Clinical Genomics Decision Support Platform.
-GitHub Repository, 2025.
+Ahmed Hassan. OpenCare: An Open-Source, Vendor-Agnostic Clinical Genomics Decision Support Platform. GitHub Repository, 2025.
