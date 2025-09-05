@@ -62,7 +62,7 @@ The tool emphasizes reproducibility, transparency, and institutional adaptabilit
 
 
 ## Real work snapshot
-![Real work snapshot](assets/Real_work_snapshot1)
+![Real work snapshot](assets/Real_work_snapshot)
 
 
 ## Reproducibility
