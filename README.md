@@ -61,6 +61,9 @@ The tool emphasizes reproducibility, transparency, and institutional adaptabilit
 🔗 [OpenCARE Demo (HTML)](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)
 
 
+## Real work snapshot
+![Real work snapshot](assets/real_work_snapshot.png)
+
 
 ## Reproducibility
 - Built on **Nextflow DSL2** for portability and scalability.
