@@ -66,7 +66,7 @@ The tool emphasizes reproducibility, transparency, and institutional adaptabilit
 
 ## Real Sample Prototype  
 (Core functionality is currently operational, while additional features remain under development.)  
-🔗 [OpenCARE Real Sample Prototype (HTML)](https://ahmedHassan-bioinfo/docs/OpenCare_ERR194146_report.html)
+🔗 [OpenCARE Real Sample Prototype (HTML)](https://ahmedhassan-bioinfo.github.io/OpenCare/docs/OpenCare_ERR194146_report.html)
 
 
 ## Reproducibility
