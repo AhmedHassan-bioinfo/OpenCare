@@ -64,6 +64,10 @@ The tool emphasizes reproducibility, transparency, and institutional adaptabilit
 ## Real work snapshot
 ![Real work snapshot](assets/Real_work_snapshot.jpeg)
 
+## Real Sample Prototype  
+(Core functionality is currently operational, while additional features remain under development.)  
+🔗 [OpenCARE Real Sample Prototype (HTML)](https://ahmedHassan-bioinfo/OpenCare/blob/main/docs/OpenCare_ERR194146_report.html)
+
 
 ## Reproducibility
 - Built on **Nextflow DSL2** for portability and scalability.
