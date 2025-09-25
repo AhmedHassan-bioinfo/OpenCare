@@ -1,41 +1,47 @@
-OpenCare: Open-Source Clinical Genomics Decision Support Platform
+# OpenCare: Open-Source Clinical Genomics Decision Support
 
 <p align="center">
   <img src="assets/OpenCare_Nlogo.jpg" alt="OpenCARE Logo" width="550"/>
 </p>
 
-Introduction
+OpenCare is an open-source, vendor-agnostic clinical genomics decision support (CDS) platform. It processes NGS data, integrates evidence from established knowledgebases, and produces clinician-oriented HTML reports plus structured outputs suitable for EMR integration (FHIR Genomics / mCODE).
 
-OpenCare is an open-source, vendor-agnostic clinical genomics decision support (CDS) tool.
-It is designed to process next-generation sequencing (NGS) data across multiple clinical domains, integrate evidence from established knowledgebases, and generate clinician-oriented reports and structured outputs suitable for electronic medical record (EMR) integration.
+**Design goals:** reproducibility, transparency, portability (HPC, cloud, WSL2), and institutional adaptability for both research and clinical prototyping.
 
-The tool emphasizes reproducibility, transparency, and institutional adaptability. It supports both research and clinical contexts.
-
-
+---
 
 ## Features
 
 ### Cross-domain applicability
-- **Oncology:** somatic & germline variant tiering (AMP/ESMO/ESCAT).
-- **Pharmacogenomics:** drug–gene interactions and dosing (CPIC, PharmGKB).
-- **Inherited disease:** ACMG/ClinGen classification framework.
-- **Infectious disease:** pathogen typing & AMR prediction (CARD, ResFinder).
+
+* **Oncology:** somatic & germline variant triage (AMP/ESMO/ESCAT-style).
+* **Pharmacogenomics:** drug–gene guidance (CPIC/PharmGKB).
+* **Inherited disease:** ACMG/ClinGen-oriented summarization.
+* **Infectious disease (planned):** typing & AMR prediction (CARD/ResFinder).
 
 ### Standards-based reporting
-- Human-readable **interactive HTML** reports for tumor boards.
-- Structured outputs: **HL7 FHIR Genomics** and **mCODE** JSON bundles.
+
+* Interactive **HTML** report for tumor boards.
+* Structured outputs: **HL7 FHIR Genomics** and **mCODE** JSON bundles.
 
 ### Institutional customization
-- Configurable thresholds for variant calling, reporting cut-offs, and local drug availability.
 
+* Tunable reporting thresholds, filters, knowledge sources, and local drug formularies.
 
+### Reproducibility & scale
+
+* **Nextflow DSL2**, **containerized** execution (Docker/Podman/Singularity).
+* Runs on laptops, HPC, cloud, and **WSL2** (Windows).
+
+---
 
 ## Workflow
+
 ![Workflow Diagram](assets/OpenCare%20Workflow%20diagram.jpg)
 
 ## Prototype Video
-▶️ Watch the prototype here: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4)
 
+▶️ Watch the prototype: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4)
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=jQRYuFybSV4" target="_blank" rel="noopener noreferrer" aria-label="Watch the demo on YouTube">
@@ -43,201 +49,224 @@ The tool emphasizes reproducibility, transparency, and institutional adaptabilit
       <source srcset="https://i.ytimg.com/vi_webp/jQRYuFybSV4/maxresdefault.webp" type="image/webp">
       <source srcset="https://i.ytimg.com/vi_webp/jQRYuFybSV4/hqdefault.webp" type="image/webp">
       <source srcset="https://img.youtube.com/vi/jQRYuFybSV4/maxresdefault.jpg" type="image/jpeg">
-      <img
-        src="https://img.youtube.com/vi/jQRYuFybSV4/hqdefault.jpg"
-        alt="OpenCARE demo preview"
-        width="600"
-        loading="lazy"
-        decoding="async"
-      />
+      <img src="https://img.youtube.com/vi/jQRYuFybSV4/hqdefault.jpg" alt="OpenCARE demo preview" width="600" loading="lazy" decoding="async"/>
     </picture>
   </a>
 </p>
 
+## Live Demos
 
+* 🔗 **OpenCARE Demo (HTML):** [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE\_demo.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)
+* 🔗 **Real Sample Prototype (HTML):** [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare\_ERR194146\_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)
+  *(Core functionality is operational; more features are under active development.)*
 
-## Give it a try
+---
 
-🔗 [OpenCARE Demo (HTML)](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)
+## Install
 
-
-## Real work snapshot
-![Real work snapshot](assets/Real_work_snapshot.jpeg)
-
-## Real Sample Prototype
-(Core functionality is currently operational, with additional features still under development.)
-🔗 [OpenCARE Real Sample Prototype (HTML)](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)
-
-
-
-## Reproducibility
-- Built on **Nextflow DSL2** for portability and scalability.
-- **Containerized** execution (Docker/Singularity/Podman).
-- Compatible with HPC and cloud.
-
-## Open-source and extensible
-- Modular design for swapping in new callers, annotations, or reporting templates.
-
-  
-## Project Structure
-<pre> OpenCare_project/
-├── workflows/ # DSL2 workflows (clinical_core.nf, etc.)
-├── modules/ # Processes (alignment, calling, VEP, reporting)
-├── config/ # Profiles and resource settings
-├── references/ # Reference genomes, annotations, KB snapshots
-├── test_data/ # Toy FASTQ/VCF for validation
-├── results/ # Reports, VCFs, BAMs, FHIR/mCODE bundles
-├── work/ # Nextflow work directory (on Linux FS)
-├── logs/ # Execution logs and traces
-└── docs/ # Documentation and protocols
-</pre>
-
-
-
-> **WSL2/Windows note:** keep **project, `work/`, and `results/` on Linux (ext4)** for locking and performance. Treat `E:`/`D:` mounts as read-only inputs whenever possible.
-
-## Installation
-  
 **Requirements**
-- Nextflow ≥ 23
-- Java 11 or 17
-- Docker (or Singularity)
-- Access to reference data (e.g., GRCh38, GTF, gnomAD, ClinVar)
-- Optional: VEP cache for offline annotation
 
+* Nextflow ≥ 23
+* Java 11 or 17
+* Docker (or Podman/Singularity)
+* Access to reference data (e.g., **GRCh38** FASTA + FAI; BWA index auto-built)
+* Optional: **VEP cache** for offline annotation
+* Optional: **Graphviz** (for DAG rendering)
 
-
-
-## Setup
 ```bash
 git clone https://github.com/AhmedHassan-bioinfo/OpenCare
 cd OpenCare
 ```
 
-  
-##Configuration (important on WSL2/Windows)
-Set the Nextflow work dir to Linux FS:
+> **WSL2/Windows note:** keep **the repo, `work/`, and `results/` on Linux (ext4)** for file locking and performance. Treat `/mnt/e` or `/mnt/d` as **read-only inputs** when possible.
+
+---
+
+## Quick start
+
+### Minimal single-sample run (WES/WGS tumor-only)
+
 ```bash
-nextflow run workflows/clinical_core.nf -w "$HOME/nxf_work"  -profile docker
-```
-Use a Linux path for outputs, e.g. --outdir "$HOME/OpenCare_out".
-
-If inputs live on Windows mounts (e.g., /mnt/e/...), use them as read-only. Avoid publishing to /mnt/e to prevent I/O/file-lock errors.
-
-Stage-in is configured to use symlinks (or copy) to avoid cross-device hard-link issues.
-
-VEP cache inside Docker
-
-Bind your cache read-only (example):
-```bash
-docker.runOptions = '-v /mnt/d/vep_cache:/vep_cache:ro --tmpfs /tmp:exec'
-params.vep_cache  = '/vep_cache'
-```
-
-
-
-  
-## Usage (works for any sample)
-
-> **Tip:** Nextflow groups read pairs by the shared prefix before `{1,2}` (or `_R{1,2}`), so keep your files named like `SAMPLE_1.fastq.gz` / `SAMPLE_2.fastq.gz` or `SAMPLE_R1.fastq.gz` / `SAMPLE_R2.fastq.gz`.
-
-### Whole-Genome Sequencing 
-
-**Tumor-only WGS (single sample) (replace placeholders):**
-
-nextflow run workflows/clinical_core.nf \
-  --reads  '/path/to/tumor/<SAMPLE_ID>_{1,2}.fastq.gz' \
-  --ref_fa '/path/to/refs/hg38.fa' \
+nextflow run main.nf \
+  --reads  "$HOME/OpenCare/reads/<SAMPLE_ID>_R{1,2}.fastq.gz" \
+  --ref_fa "/path/to/refs/hg38.fa" \
   --outdir "$HOME/OpenCare_out/<SAMPLE_ID>" \
   -w "$HOME/nxf_work" \
-  -profile docker
+  -with-docker -resume
+```
 
-(WIP)
-Pharmacogenomics (PGx) VCF
-nextflow run workflows/clinical_core.nf \
-  --vcf '/path/to/pgx/<SAMPLE_ID>.vcf.gz' \
-  --pgx true \
-  --outdir "$HOME/OpenCare_out/pgx_<SAMPLE_ID>" \
+### Tumor/Normal paired exome (Mutect2 path)
+
+```bash
+nextflow run main.nf \
+  --reads  "$HOME/OpenCare/reads/Exome_*/*_R{1,2}.fastq.gz" \
+  --ref_fa "/path/to/refs/hg38.fa" \
+  --tumor_id  "Exome_Tumor" \
+  --normal_id "Exome_Norm" \
+  --patient_id P01 \
+  --outdir "$HOME/OpenCare_out/P01" \
   -w "$HOME/nxf_work" \
-  -profile docker
+  -with-docker -resume
+```
 
-(Planned)
-Infectious Disease (Pathogen Resistance)
-nextflow run workflows/clinical_core.nf \
-  --reads  '/path/to/microbes/<SAMPLE_ID>_{1,2}.fastq.gz' \
-  --ref_fa '/path/to/microbes/<SPECIES>.fa' \
-  --outdir "$HOME/OpenCare_out/micro_<SAMPLE_ID>" \
+> **Read pairing & sample IDs:** Nextflow groups `*_R{1,2}.fastq.gz` (or `{1,2}.fastq.gz`). For tumor/normal, set `--tumor_id` and `--normal_id` to **the exact sample IDs** (the `sid` emitted by read grouping).
+
+### Optional: VEP annotation (offline cache inside Docker)
+
+```bash
+# nextflow.config (example)
+docker.runOptions = '-v /mnt/d/vep_cache:/vep_cache:ro --tmpfs /tmp:exec'
+
+# run
+nextflow run main.nf \
+  --reads  "$HOME/OpenCare/reads/<SAMPLE_ID>_R{1,2}.fastq.gz" \
+  --ref_fa "/refs/hg38.fa" \
+  --vep_cache "/vep_cache" \
+  --outdir "$HOME/OpenCare_out/<SAMPLE_ID>" \
   -w "$HOME/nxf_work" \
-  -profile docker
+  -with-docker -resume
+```
 
+### Optional: Panel QC (mosdepth) and pathway overlays
+
+```bash
+nextflow run main.nf \
+  --reads "$HOME/OpenCare/reads/<SAMPLE_ID>_R{1,2}.fastq.gz" \
+  --ref_fa "/refs/hg38.fa" \
+  --panel_bed "/refs/panel_targets.bed" \
+  --pathway_db "$PWD/resources/pathway_gene_map_v1.json" \
+  --gene_domains "$PWD/resources/gene_domains.json" \
+  --outdir "$HOME/OpenCare_out/<SAMPLE_ID>" \
+  -w "$HOME/nxf_work" \
+  -with-docker -resume
+```
+
+---
 
 ## Outputs
 
-Reports: interactive HTML (variant table, filters, clickable evidence).
+* **Interactive HTML:** `results/<SAMPLE_ID>/OpenCare_<SAMPLE_ID>_report.html`
+* **Structured JSON:**
 
-Structured data: HL7 FHIR Genomics + mCODE JSON bundles.
+  * Slim report JSON (drives HTML)
+  * Full report JSON
+  * **mCODE** bundle JSON
+* **VCF/CRAM/QC:**
 
-Intermediate files: BAM/BAI, (VEP-)VCF/VCF.TBI, QC metrics.
+  * (VEP-)VCF + index
+  * Sorted/mark-dup CRAM + CRAI
+  * FastQC/fastp summaries, mosdepth panel QC (if `--panel_bed`)
+* **Execution metadata:** Nextflow trace, .log, timeline, provenance
 
-Execution metadata: Nextflow traces, logs, provenance.
+---
 
-    
+## Configuration tips (especially WSL2)
 
-## Data Sources
+* Use Linux paths for `-w` and `--outdir`:
 
-Oncology: CIViC, OncoKB (research license), ClinVar, ClinGen
+  ```bash
+  -w "$HOME/nxf_work"  --outdir "$HOME/OpenCare_out"
+  ```
+* Inputs on `/mnt/e` or `/mnt/d` are fine as **read-only**. Avoid writing results to Windows mounts to prevent I/O and locking errors.
+* Stage-in uses symlink (or copy) modes to avoid cross-device hard-link issues.
 
-Pharmacogenomics: PharmGKB, CPIC
+---
 
-Inherited disease: ClinVar, ACMG/AMP criteria
+## Common parameters (cheat sheet)
 
-Pathogen resistance: CARD, ResFinder
+| Param                                      | Purpose                                            | Example                     |         |
+| ------------------------------------------ | -------------------------------------------------- | --------------------------- | ------- |
+| `--reads`                                  | FASTQ glob with R1/R2 brace expansion              | `reads/S1_R{1,2}.fastq.gz`  |         |
+| `--ref_fa`                                 | Reference FASTA (FAI auto-generated)               | `/refs/hg38.fa`             |         |
+| `--tumor_id`, `--normal_id`                | Enable TN path with Mutect2                        | `Exome_Tumor`, `Exome_Norm` |         |
+| `--vep_cache`                              | Enable VEP offline cache                           | `/vep_cache`                |         |
+| `--panel_bed`                              | Panel regions for mosdepth QC and targeted calling | `/refs/panel_targets.bed`   |         |
+| `--patient_id`                             | Patient identifier embedded in JSON/mCODE          | `P01`                       |         |
+| `--assay`                                  | Label: `panel`, `wes`, `wgs`                       | `wes`                       |         |
+| `--knowledge_tsv`                          | Local knowledge snippets (optional)                | `kb_global_template.tsv`    |         |
+| `--pathway_db`, `--gene_domains`           | JSON overlays for HTML                             | `resources/*.json`          |         |
+| `--report_use_csq`                         | Filter HTML VCF by CSQ regex                       | \`true                      | false\` |
+| `--report_keep_impact`                     | Keep impacts (CSV)                                 | `HIGH,MODERATE`             |         |
+| `--enable_evidence`                        | Try online enrichment (CIViC/heuristics)           | \`true                      | false\` |
+| `--region` / `--targets_bed`               | Restrict bcftools calling                          | `chr7:55M-56M` / BED        |         |
+| `--max_cpus`, `--max_mem`, `--bwa_threads` | Resource knobs                                     | `8`, `24 GB`, `4`           |         |
 
-Population refs: gnomAD, 1000 Genomes, TCGA, GENIE
+> **OncoKB:** set `ONCOKB_TOKEN` in the environment to enable OncoKB calls where applicable.
 
-    
+---
+
+## Project structure (top-level)
+
+```
+OpenCare/
+├── main.nf                 # Clinical core workflow (DSL2)
+├── HTML/
+│   └── build_html.py       # HTML builder
+├── resources/
+│   ├── pathway_gene_map_v1.json
+│   └── gene_domains.json
+├── assets/                 # Logos, diagrams, screenshots
+├── results/                # Default publish dir (configurable)
+├── work/                   # Nextflow work dir (recommend on ext4)
+└── test_data/              # Small validation datasets (optional)
+```
+
+> **Note:** Graphviz is optional; install to render DAG (`-with-dag`).
+
+---
+
+## Troubleshooting
+
+* **“Invalid method invocation `call` … on \_closureXX”**
+  Happens when a Channel/closure is mistakenly called like a function. The workflow in this repo already wires **paired TN** (`CALL_SOMATIC_MUTECT2`) vs **single-sample** (`CALL_VARIANTS_CRAM`) correctly and passes emitted channels to downstream steps.
+* **WSL2 locking / cross-device link issues**
+  Keep `-w` and `--outdir` under Linux home (ext4). Treat `/mnt/e` inputs as read-only.
+* **Missing `--reads` / `--ref_fa`**
+  Both are required for sequencing input mode; provide valid Linux paths.
+
+---
+
+## Data sources (by domain)
+
+* **Oncology:** CIViC, OncoKB (research license), ClinVar, ClinGen
+* **Pharmacogenomics:** PharmGKB, CPIC
+* **Inherited disease:** ClinVar, ACMG/AMP oriented heuristics
+* **Pathogen resistance:** CARD, ResFinder (planned)
+* **Population/aux:** gnomAD, 1KG, TCGA/GENIE (as available)
+
+---
 
 ## Validation & Benchmarking (planned)
 
-Cross-validation on retrospective cohorts (~200 cases).
+* Retrospective cohorts (\~200 cases), concordance vs. vendor pipelines (QCI, CI, SOPHiA).
+* EMR integration checks via FHIR Genomics validators.
+* Metrics: precision/recall, Tier I/II concordance, PGx phenotypes, AMR accuracy.
 
-Concordance vs. vendor pipelines (Qiagen QCI, Illumina CI, SOPHiA DDM).
-
-EMR integration checks with FHIR Genomics validators.
-
-Metrics: precision/recall, concordance for Tier I/II oncology, PGx phenotypes, AMR.
-
-    
 ## Limitations
 
-Knowledgebase coverage varies by disease area.
-
-Harmonizing panel/WES/WGS requires calibration (e.g., TMB/MSI).
-
-CHIP can confound liquid biopsy; filtering strategies recommended.
-
-Institutional customization required for clinical deployment.
+* Knowledgebase coverage varies by indication.
+* Harmonization across panel/WES/WGS needs calibration (e.g., TMB/MSI).
+* CHIP may confound ctDNA; consider orthogonal filters.
+* Institutional customization required for clinical deployment.
 
 ## Roadmap
 
-ML classifiers for prioritization.
+* ML ranking/prioritization.
+* ClinicalTrials.gov trial matching.
+* Multi-omics (RNA-seq, proteomics, methylation).
 
-ClinicalTrials.gov trial matching.
-
-Multi-omics extensions (RNA-seq, proteomics, methylation).
-
-### Disclaimers
-- All dates are targets; scope may shift if validation fails quality gates.
-
+---
 
 ## Contributing
-Contributions welcome—see CONTRIBUTING.md for coding standards and review.
+
+Contributions welcome—see `CONTRIBUTING.md` for coding style, review, and issue labels.
 
 ## License
+
 Apache License 2.0
 
 ## Citation
 
 If you use OpenCare in your work, please cite:
 
-Ahmed Hassan. OpenCare: An Open-Source, Vendor-Agnostic Clinical Genomics Decision Support Platform. GitHub Repository, 2025.
+> Ahmed Hassan. **OpenCare: An Open-Source, Vendor-Agnostic Clinical Genomics Decision Support Platform.** GitHub Repository, 2025.
