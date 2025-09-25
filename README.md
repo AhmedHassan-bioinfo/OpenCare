@@ -3,7 +3,6 @@
 <!-- Badges -->
 [![Build](https://github.com/AhmedHassan-bioinfo/OpenCare/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AhmedHassan-bioinfo/OpenCare/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/github/license/AhmedHassan-bioinfo/OpenCare)](LICENSE)
-[![Latest Release](https://img.shields.io/github/v/release/AhmedHassan-bioinfo/OpenCare)](https://github.com/AhmedHassan-bioinfo/OpenCare/releases)
 
 <p align="center">
   <img src="assets/OpenCare_Nlogo.jpg" alt="OpenCARE Logo" width="550"/>
