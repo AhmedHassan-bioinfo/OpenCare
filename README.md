@@ -1,4 +1,9 @@
-# OpenCare: Open-Source Clinical Genomics Decision Support
+# OpenCare: Open-Source Clinical Genomics Decision Support Platform
+
+<!-- Badges -->
+[![Build](https://github.com/AhmedHassan-bioinfo/OpenCare/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AhmedHassan-bioinfo/OpenCare/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/github/license/AhmedHassan-bioinfo/OpenCare)](LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/AhmedHassan-bioinfo/OpenCare)](https://github.com/AhmedHassan-bioinfo/OpenCare/releases)
 
 <p align="center">
   <img src="assets/OpenCare_Nlogo.jpg" alt="OpenCARE Logo" width="550"/>
@@ -78,7 +83,7 @@ git clone https://github.com/AhmedHassan-bioinfo/OpenCare
 cd OpenCare
 ```
 
-> **WSL2/Windows note:** keep **the repo, `work/`, and `results/` on Linux (ext4)** for file locking and performance. Treat `/mnt/e` or `/mnt/d` as **read-only inputs** when possible.
+> **WSL2/Windows note:** keep **the repo, `work/`, and `results/` on Linux (ext4)** for file locking and performance. Treat `/mnt/*` as **read-only inputs** when possible.
 
 ---
 
@@ -114,9 +119,6 @@ nextflow run main.nf \
 ### Optional: VEP annotation (offline cache inside Docker)
 
 ```bash
-# nextflow.config (example)
-docker.runOptions = '-v /mnt/d/vep_cache:/vep_cache:ro --tmpfs /tmp:exec'
-
 # run
 nextflow run main.nf \
   --reads  "$HOME/OpenCare/reads/<SAMPLE_ID>_R{1,2}.fastq.gz" \
@@ -167,7 +169,7 @@ nextflow run main.nf \
   ```bash
   -w "$HOME/nxf_work"  --outdir "$HOME/OpenCare_out"
   ```
-* Inputs on `/mnt/e` or `/mnt/d` are fine as **read-only**. Avoid writing results to Windows mounts to prevent I/O and locking errors.
+* Inputs on `/mnt/*` are fine as **read-only**. Avoid writing results to Windows mounts to prevent I/O and locking errors.
 * Stage-in uses symlink (or copy) modes to avoid cross-device hard-link issues.
 
 ---
@@ -220,7 +222,7 @@ OpenCare/
 * **“Invalid method invocation `call` … on \_closureXX”**
   Happens when a Channel/closure is mistakenly called like a function. The workflow in this repo already wires **paired TN** (`CALL_SOMATIC_MUTECT2`) vs **single-sample** (`CALL_VARIANTS_CRAM`) correctly and passes emitted channels to downstream steps.
 * **WSL2 locking / cross-device link issues**
-  Keep `-w` and `--outdir` under Linux home (ext4). Treat `/mnt/e` inputs as read-only.
+  Keep `-w` and `--outdir` under Linux home (ext4). Treat `/mnt/*` inputs as read-only.
 * **Missing `--reads` / `--ref_fa`**
   Both are required for sequencing input mode; provide valid Linux paths.
 
