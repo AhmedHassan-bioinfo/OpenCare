@@ -17,15 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [0.1.0] – 2025-09-10
+
+
+## v0.0.2 (2025-10-01)
+- Integrated **MSK Cancer Hotspot** database.
+- Added hotspot-level annotation for oncology workflows.
+- Improved downstream reporting and triage.
+
+## v0.0.1 (2025-08-15)
+- Initial prototype release.
+- Basic pipeline from FASTQ → report.
+
 ### Added
 - First public release of **OpenCare**.
 - End-to-end workflow written in Nextflow DSL2.
-- Cross-domain support:
-  - Oncology variant tiering (AMP/ESMO/ESCAT).
-  - Pharmacogenomics (CPIC/PharmGKB).
-  - Inherited disease (ACMG/ClinGen).
-  - Infectious disease resistance (CARD/ResFinder).
 - Support for toy datasets for quick validation.
 - Docker container support; reproducible execution environments.
 - Standards-based outputs:
@@ -42,12 +47,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [0.1.1] – YYYY-MM-DD
+
 ### Fixed
-- [placeholder for future bugfixes]
+
 
 ### Changed
-- [placeholder for future refactoring or performance improvements]
+
 
 ### Removed
-- [placeholder for deprecated or removed features]
+
