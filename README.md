@@ -257,6 +257,16 @@ OpenCare/
 * Multi-omics (RNA-seq, proteomics, methylation).
 
 ---
+---
+
+## 📢 Release Announcements
+
+### v0.0.2 (October 1, 2025)
+- **New:** Integration of the **MSK Cancer Hotspot database** for hotspot-level annotation.  
+- Enhances clinical oncology workflows with curated hotspot coverage.  
+- Strengthens downstream triage and reporting of oncogenic variants.  
+
+*(See full history in [CHANGELOG.md](CHANGELOG.md))*
 
 ## Contributing
 
