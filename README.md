@@ -261,7 +261,7 @@ OpenCare/
 
 ## 📢 Release Announcements
 
-### v0.0.2 (October 1, 2025)
+### v0.0.2 (October 3, 2025)
 - **New:** Integration of the **MSK Cancer Hotspot database** for hotspot-level annotation.  
 - Enhances clinical oncology workflows with curated hotspot coverage.  
 - Strengthens downstream triage and reporting of oncogenic variants.  
