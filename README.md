@@ -64,6 +64,26 @@ OpenCare is an open-source, vendor-agnostic clinical genomics decision support (
 * 🔗 **Real Sample Prototype (HTML):** [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare\_ERR194146\_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)
   *(Core functionality is operational; more features are under active development.)*
 
+  
+* 🔗 **Paired Tumor/Normal Prototype (HTML):**  
+  [OpenCare_Exome_Tumor_vs_Exome_Norm_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html)  
+  *(repo path: [`docs/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html`](docs/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html))*  
+  _Includes a bundled gene→pathway database and offline **CIViC** clinical annotations (no internet required)._
+
+<details>
+<summary><strong>What is this sample?</strong></summary>
+
+- **Tumor ID:** HCC1395 — breast ductal carcinoma (primary); **Normal:** HCC1395BL (EBV-transformed B-lymphoblast)  
+- **Clinical background:** 43-year-old Caucasian female; mammary gland/duct origin; TNM stage I; grade 3; **triple-negative** (ER−/PR−/HER2−); likely basal-like; **TP53-mutant**; tumor line is **polyploid**  
+- **FASTQs:** Paired-end exome reads (~8.33M pairs, 101-bp PE)  
+- **Platform / RG:** Illumina; **RG ID:** 2891351066; **FC/Barcode/Lane:** C1TD1ACXX-ATCACG.7; **Library:** exome_tumor_lib1; **Sample name:** HCC1395_DNA  
+- **Coverage target:** Exome ~100× median depth (WGS/RNA-seq exist for the same pair)  
+- **Annotations:** Bundled **Pathway DB** (gene→pathway mapping) + offline **CIViC** clinical evidence integrated into the report  
+
+
+</details>
+
+
 ---
 
 ## Install
