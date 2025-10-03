@@ -67,7 +67,8 @@ OpenCare is an open-source, vendor-agnostic clinical genomics decision support (
   
 * 🔗 **Paired Tumor/Normal Prototype (HTML):**  
   [OpenCare_Exome_Tumor_vs_Exome_Norm_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html)  
-  _Includes a bundled gene→pathway database and offline **CIViC** clinical annotations._
+  *(repo path: [`docs/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html`](docs/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html))*  
+  _Includes a bundled gene→pathway database, offline **CIViC** clinical annotations, and summarized **arm-level CNAs** (chromosome-arm gains/losses)._
 
 <details>
 <summary><strong>What is this sample?</strong></summary>
@@ -77,10 +78,14 @@ OpenCare is an open-source, vendor-agnostic clinical genomics decision support (
 - **FASTQs:** Paired-end exome reads (~8.33M pairs, 101-bp PE)  
 - **Platform / RG:** Illumina; **RG ID:** 2891351066; **FC/Barcode/Lane:** C1TD1ACXX-ATCACG.7; **Library:** exome_tumor_lib1; **Sample name:** HCC1395_DNA  
 - **Coverage target:** Exome ~100× median depth (WGS/RNA-seq exist for the same pair)  
-- **Annotations:** Bundled **Pathway DB** (gene→pathway mapping) + offline **CIViC** clinical evidence integrated into the report  
+- **Annotations:** Bundled **Pathway DB** (gene→pathway mapping) + offline **CIViC** clinical evidence + **arm-level CNA** summary integrated into the report  
 
 
 </details>
+
+
+
+
 
 
 ---
