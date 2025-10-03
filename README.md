@@ -60,12 +60,14 @@ OpenCare is an open-source, vendor-agnostic clinical genomics decision support (
 
 ## Live Demos
 
-* 🔗 **OpenCARE Demo (HTML):** [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE\_demo.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)
-* 🔗 **Real Sample Prototype (HTML):** [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare\_ERR194146\_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)
+* 🔗 **OpenCARE Demo (HTML)** — *Updated: Aug 30, 2025*  
+  [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)  
   *(Core functionality is operational; more features are under active development.)*
 
-  
-* 🔗 **Paired Tumor/Normal Prototype (HTML):**  
+* 🔗 **Real Sample dry run(HTML)** — *Updated: Sep 24, 2025*  
+  [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)
+
+* 🔗 **Paired Tumor/Normal exome (HTML)** — *Updated: Oct 3, 2025*  
   [OpenCare_Exome_Tumor_vs_Exome_Norm_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html)  
   _Includes a bundled gene→pathway database, offline **CIViC** clinical annotations, and summarized **arm-level CNAs** (chromosome-arm gains/losses)._
 
@@ -79,13 +81,7 @@ OpenCare is an open-source, vendor-agnostic clinical genomics decision support (
 - **Coverage target:** Exome ~100× median depth (WGS/RNA-seq exist for the same pair)  
 - **Annotations:** Bundled **Pathway DB** (gene→pathway mapping) + offline **CIViC** clinical evidence + **arm-level CNA** summary integrated into the report  
 
-
 </details>
-
-
-
-
-
 
 ---
 
