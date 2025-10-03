@@ -67,7 +67,7 @@ OpenCare is an open-source, vendor-agnostic clinical genomics decision support (
   
 * 🔗 **Paired Tumor/Normal Prototype (HTML):**  
   [OpenCare_Exome_Tumor_vs_Exome_Norm_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html)  
-  _Includes a bundled gene→pathway database and offline **CIViC** clinical annotations (no internet required)._
+  _Includes a bundled gene→pathway database and offline **CIViC** clinical annotations._
 
 <details>
 <summary><strong>What is this sample?</strong></summary>
