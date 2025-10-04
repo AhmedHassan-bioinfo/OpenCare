@@ -62,10 +62,12 @@ OpenCare is an open-source, vendor-agnostic clinical genomics decision support (
 
 * 🔗 **OpenCARE Demo (HTML)** — *Updated: Aug 30, 2025*  
   [OpenCARE demo](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)  
-  *(Core functionality is operational; more features are under active development.)*
+  *(Future features and concepts visualization using toy data.)*
+
 
 * 🔗 **Real Sample dry run(HTML)** — *Updated: Sep 24, 2025*  
   [OpenCare ERR194146 report](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)
+  *(Core functionality is operational; more features are under active development.)*
 
 * 🔗 **Paired Tumor/Normal exome (HTML)** — *Updated: Oct 3, 2025*  
   [OpenCare HCC1395/HCC1395BL Exome tumor vs Exome Norm report](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html)  
