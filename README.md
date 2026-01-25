@@ -302,7 +302,3 @@ If you use OpenCare in your work, please cite:
 
 > Ahmed Hassan. **OpenCare: reproducible Nextflow workflow for tumor–normal variant calling and review reporting.** GitHub Repository, 2025.
 
-```
-::contentReference[oaicite:0]{index=0}
-```
-
