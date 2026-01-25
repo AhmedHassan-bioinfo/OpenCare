@@ -1,15 +1,3 @@
-Yep — GitHub sometimes breaks image/video rendering when the README ends up inside a code block or when there’s an unclosed fence earlier. The safest fix is:
-
-1. **Make sure there is NO triple backtick before this section** (or it will render as plain text and images won’t load).
-2. Use **plain Markdown + simple `<img>` tags only** (avoid `<picture>`; GitHub can be picky).
-3. Keep the workflow image path exactly as your repo expects.
-
-Here is a **clean, GitHub-safe block** you can paste starting from the top of README. It keeps your logo + workflow image + YouTube thumbnail working reliably.
-
----
-
-### ✅ Copy-paste this (NO surrounding ``` fences)
-
 # OpenCare: Reproducible Nextflow workflow for tumor–normal variant calling and review reporting
 
 <!-- Badges -->
