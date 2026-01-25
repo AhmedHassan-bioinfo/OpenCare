@@ -1,13 +1,25 @@
-````markdown
+Yep — GitHub sometimes breaks image/video rendering when the README ends up inside a code block or when there’s an unclosed fence earlier. The safest fix is:
+
+1. **Make sure there is NO triple backtick before this section** (or it will render as plain text and images won’t load).
+2. Use **plain Markdown + simple `<img>` tags only** (avoid `<picture>`; GitHub can be picky).
+3. Keep the workflow image path exactly as your repo expects.
+
+Here is a **clean, GitHub-safe block** you can paste starting from the top of README. It keeps your logo + workflow image + YouTube thumbnail working reliably.
+
+---
+
+### ✅ Copy-paste this (NO surrounding ``` fences)
+
 # OpenCare: Reproducible Nextflow workflow for tumor–normal variant calling and review reporting
 
 <!-- Badges -->
+
 [![Build](https://github.com/AhmedHassan-bioinfo/OpenCare/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AhmedHassan-bioinfo/OpenCare/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18365283.svg)](https://doi.org/10.5281/zenodo.18365283)
 
 <p align="center">
-  <img src="assets/OpenCare_Nlogo.jpg" alt="OpenCare Logo" width="550"/>
+  <img src="assets/OpenCare_Nlogo.jpg" alt="OpenCare Logo" width="550">
 </p>
 
 OpenCare is an open-source, vendor-agnostic **NGS analysis and review-reporting workflow** built with Nextflow. It processes sequencing reads, runs standard somatic calling/annotation tools, and produces a **tumor-board–style HTML report** plus **versioned JSON exports** intended for downstream consumption.
@@ -15,56 +27,57 @@ OpenCare is an open-source, vendor-agnostic **NGS analysis and review-reporting 
 **Design goals:** reproducibility, transparency, portability (HPC, cloud, WSL2), and easy adaptation for research workflows and review-oriented reporting.
 
 > **Scope & safety note**
-> - OpenCare is intended for **research and workflow prototyping** and is **not** a regulated diagnostic system.
-> - The example evaluation uses the **HCC1395/HCC1395BL** benchmark; performance under low purity, low coverage, or FFPE artifacts requires additional evaluation.
-> - Indels often require extra scrutiny/confirmation; see **Limitations** below.
-> - The CNA-style plot in the HTML is **QC-only** and must not be interpreted as copy-number calls.
+>
+> * OpenCare is intended for **research and workflow prototyping** and is **not** a regulated diagnostic system.
+> * The example evaluation uses the **HCC1395/HCC1395BL** benchmark; performance under low purity, low coverage, or FFPE artifacts requires additional evaluation.
+> * Indels often require extra scrutiny/confirmation; see **Limitations** below.
+> * The CNA-style plot in the HTML is **QC-only** and must not be interpreted as copy-number calls.
 
 ---
 
 ## Features
 
 ### Reporting and structured exports
-- Interactive **HTML** report for case review / tumor-board discussion.
-- **Versioned JSON exports** (a slim JSON driving the HTML, plus a fuller JSON for downstream use).
-- Optional **FHIR/mCODE-style JSON exports** (lightweight scaffolding for integration experiments; may require local mapping and validation for any specific implementation guide).
+
+* Interactive **HTML** report for case review / tumor-board discussion.
+* **Versioned JSON exports** (a slim JSON driving the HTML, plus a fuller JSON for downstream use).
+* Optional **FHIR/mCODE-style JSON exports** (lightweight scaffolding for integration experiments; may require local mapping and validation for any specific implementation guide).
 
 ### Workflow execution
-- **Nextflow DSL2**, containerized execution (Docker/Podman/Singularity).
-- Runs on laptops, HPC, cloud, and **WSL2** (Windows).
+
+* **Nextflow DSL2**, containerized execution (Docker/Podman/Singularity).
+* Runs on laptops, HPC, cloud, and **WSL2** (Windows).
 
 ### Customization
-- Tunable reporting thresholds and filters.
-- Optional overlays (pathway mapping, gene domains).
-- Optional enrichment hooks (see *Offline mode* below).
+
+* Tunable reporting thresholds and filters.
+* Optional overlays (pathway mapping, gene domains).
+* Optional enrichment hooks (see *Offline mode* below).
 
 ---
 
 ## Offline mode (what it means here)
 
-OpenCare can run in restricted environments once **containers** and **offline resources** (e.g., VEP cache, CIViC snapshot) are staged locally.  
+OpenCare can run in restricted environments once **containers** and **offline resources** (e.g., VEP cache, CIViC snapshot) are staged locally.
 Optional online enrichments (e.g., **OncoKB**) require internet access and credentials and are **not compatible with fully offline execution**.
 
 ---
 
 ## Workflow
 
-![Workflow Diagram](assets/OpenCare%20Workflow%20diagram.jpg)
+<p align="center">
+  <img src="assets/OpenCare%20Workflow%20diagram.jpg" alt="OpenCare workflow diagram" width="900">
+</p>
 
 ---
 
 ## Prototype Video
 
-▶️ Watch the prototype: [Demo Video on YouTube](https://www.youtube.com/watch?v=jQRYuFybSV4)
+▶️ Watch the prototype: [https://www.youtube.com/watch?v=jQRYuFybSV4](https://www.youtube.com/watch?v=jQRYuFybSV4)
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=jQRYuFybSV4" target="_blank" rel="noopener noreferrer" aria-label="Watch the demo on YouTube">
-    <picture>
-      <source srcset="https://i.ytimg.com/vi_webp/jQRYuFybSV4/maxresdefault.webp" type="image/webp">
-      <source srcset="https://i.ytimg.com/vi_webp/jQRYuFybSV4/hqdefault.webp" type="image/webp">
-      <source srcset="https://img.youtube.com/vi/jQRYuFybSV4/maxresdefault.jpg" type="image/jpeg">
-      <img src="https://img.youtube.com/vi/jQRYuFybSV4/hqdefault.jpg" alt="OpenCare demo preview" width="600" loading="lazy" decoding="async"/>
-    </picture>
+  <a href="https://www.youtube.com/watch?v=jQRYuFybSV4">
+    <img src="https://img.youtube.com/vi/jQRYuFybSV4/hqdefault.jpg" alt="OpenCare demo preview" width="600">
   </a>
 </p>
 
@@ -72,25 +85,25 @@ Optional online enrichments (e.g., **OncoKB**) require internet access and crede
 
 ## Live Demos
 
-- 🔗 **HTML demo (toy data)** — *Updated: Aug 30, 2025*  
-  [OpenCare demo](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)  
+* 🔗 **HTML demo (toy data)** — *Updated: Aug 30, 2025*
+  [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCARE_demo.html)
   *(Concept visualization using toy data.)*
 
-- 🔗 **Dry run report (real-world dataset)** — *Updated: Sep 24, 2025*  
-  [OpenCare ERR194146 report](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)  
+* 🔗 **Dry run report (real-world dataset)** — *Updated: Sep 24, 2025*
+  [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)
   *(Core functionality; features continue to evolve.)*
 
-- 🔗 **Paired tumor/normal exome (HCC1395/HCC1395BL)** — *Updated: Oct 3, 2025*  
-  [OpenCare HCC1395/HCC1395BL report](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html)  
+* 🔗 **Paired tumor/normal exome (HCC1395/HCC1395BL)** — *Updated: Oct 3, 2025*
+  [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html)
   *Includes offline CIViC annotations and a CNA-style coverage ratio plot (QC only).*
 
 <details>
 <summary><strong>What is this sample?</strong></summary>
 
-- **Benchmark pair:** HCC1395 (tumor) / HCC1395BL (matched normal; cell-line derived)  
-- **Assay:** Paired-end exome FASTQs  
-- **Purpose:** Public benchmark demonstration of the paired tumor–normal path  
-- **Notes:** Cell-line benchmarks do not represent all clinical sample conditions (purity, FFPE damage, capture variability).
+* **Benchmark pair:** HCC1395 (tumor) / HCC1395BL (matched normal; cell-line derived)
+* **Assay:** Paired-end exome FASTQs
+* **Purpose:** Public benchmark demonstration of the paired tumor–normal path
+* **Notes:** Cell-line benchmarks do not represent all clinical sample conditions (purity, FFPE damage, capture variability).
 
 </details>
 
@@ -99,17 +112,20 @@ Optional online enrichments (e.g., **OncoKB**) require internet access and crede
 ## Install
 
 **Requirements**
-- Nextflow ≥ 23
-- Java 11 or 17
-- Docker (or Podman/Singularity)
-- Reference data (e.g., **GRCh38** FASTA + FAI; BWA index auto-built)
-- Optional: **VEP cache** for offline annotation
-- Optional: **Graphviz** (for DAG rendering)
+
+* Nextflow ≥ 23
+* Java 11 or 17
+* Docker (or Podman/Singularity)
+* Reference data (e.g., **GRCh38** FASTA + FAI; BWA index auto-built)
+* Optional: **VEP cache** for offline annotation
+* Optional: **Graphviz** (for DAG rendering)
 
 ```bash
 git clone https://github.com/AhmedHassan-bioinfo/OpenCare
 cd OpenCare
-````
+```
+
+---
 
 > **WSL2/Windows note:** keep the repo, `work/`, and `results/` on Linux (ext4) for file locking and performance. Treat `/mnt/*` as read-only inputs when possible.
 
