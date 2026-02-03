@@ -1,0 +1,3 @@
+region	region_bed	region_bases	region_Mb	variant	TP	FP	FN	recall	precision	F1	FP_per_Mb
+targets∩HC∩callable	/mnt/e/OpenCare_project/results/benchmark/HC_x_PANEL_callable.dp10.bed	52873961	52.873961	SNV	0,NA,PASS,756,669,87,688,19,0,NA,0.8849,0.9724,0.0,0.9266,NA,NA,NA,NA	0,NA,PASS,756,669,87,688,19,0,NA,0.8849,0.9724,0.0,0.9266,NA,NA,NA,NA	0,NA,PASS,756,669,87,688,19,0,NA,0.8849,0.9724,0.0,0.9266,NA,NA,NA,NA				0.000000
+targets∩HC∩callable	/mnt/e/OpenCare_project/results/benchmark/HC_x_PANEL_callable.dp10.bed	52873961	52.873961	INDEL	0	0,NA,PASS,38,37,1,62,25,0,NA,0.9737,0.5968,0.0,0.74,NA,NA,NA,NA	0,NA,PASS,38,37,1,62,25,0,NA,0.9737,0.5968,0.0,0.74,NA,NA,NA,NA	0,NA,PASS,38,37,1,62,25,0,NA,0.9737,0.5968,0.0,0.74,NA,NA,NA,NA			0.000000

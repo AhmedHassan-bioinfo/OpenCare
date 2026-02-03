@@ -1,0 +1,13 @@
+Region restriction	Variant class	VAF stratum	Precision	Recall	F1
+High-confidence ∩ callable (DP≥10 in tumor & normal)	SNV	Overall			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	Indel	Overall			
+Protein-coding exons ±10 bp (restricted)	SNV	Overall			
+Protein-coding exons ±10 bp (restricted)	Indel	Overall			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	SNV	<5%			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	SNV	5–10%			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	SNV	10–20%			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	SNV	≥20%			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	Indel	<5%			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	Indel	5–10%			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	Indel	10–20%			
+High-confidence ∩ callable (DP≥10 in tumor & normal)	Indel	≥20%			

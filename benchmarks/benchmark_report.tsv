@@ -1,0 +1,5 @@
+metric	value	nf_tasks	nf_cached_tasks	nf_sum_realtime_h	nf_sum_cpu_h	nf_max_peak_rss_gb	nf_max_peak_vmem_gb	nf_sum_rchar_gb	nf_sum_wchar_gb
+tasks_total	35	36	34	38.384	171.059	6.7	10.5	0.0	0.0
+tasks_completed	1	36	34	38.384	171.059	6.7	10.5	0.0	0.0
+wall_hours_total	38.3822	36	34	38.384	171.059	6.7	10.5	0.0	0.0
+cpu_hours_total	171.0563	36	34	38.384	171.059	6.7	10.5	0.0	0.0

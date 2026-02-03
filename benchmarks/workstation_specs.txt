@@ -1,0 +1,32 @@
+pipeline_start_time: 2026-01-31 13:40:55.518000
+pipeline_end_time: 2026-02-03 08:25:17.196000
+pipeline_wall_clock_seconds: 240261.678
+tasks_total: 36
+tasks_succeeded: 36
+tasks_failed: 0
+tasks_cached: 34
+total_cpu_time_seconds: 615810.721
+sum_realtime_seconds: 138184.006
+max_realtime_seconds: 36738.000
+max_peak_rss_gb: 6.700
+max_peak_vmem_gb: 10.500
+sum_rchar_gb: 0.000
+sum_wchar_gb: 0.000
+hostname: b7531defa631
+user: root
+os_name: Debian GNU/Linux 13 (trixie)
+kernel_version: 6.6.87.2-microsoft-standard-WSL2
+wsl_detected: true
+cpu_model: AMD Ryzen 5 7600X 6-Core Processor
+cpu_sockets: 1
+cpu_cores_physical: 4
+cpu_threads_logical: 8
+mem_total_gb: 27.41
+disk_workdir_total_gb: 1681.09
+disk_workdir_avail_gb: 81.32
+disk_outdir_total_gb: 
+disk_outdir_avail_gb: 
+gpu_name: 
+gpu_driver_version: 
+cuda_version: 
+java_version: /bin/sh: 1: java: not found
