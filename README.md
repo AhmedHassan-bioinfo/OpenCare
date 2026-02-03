@@ -81,9 +81,12 @@ Optional online enrichments (e.g., **OncoKB**) require internet access and crede
   [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_ERR194146_report.html)
   *(Core functionality; features continue to evolve.)*
 
-* 🔗 **Paired tumor/normal exome (HCC1395/HCC1395BL)** — *Updated: Oct 3, 2025*
+* 🔗 **Dry run 2 Paired tumor/normal exome (HCC1395/HCC1395BL)** — *Updated: Oct 3, 2025*
   [https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html)
   *Includes offline CIViC annotations and a CNA-style coverage ratio plot (QC only).*
+
+  * 🔗 **Benchmark run Paired tumor/normal exome SRR7890849/SRR7890875 (HCC1395/HCC1395BL)** — *Updated: Feb 4, 2026*
+[https://ahmedhassan-bioinfo.github.io/OpenCare/SRR7890849_SRR7890875_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/SRR7890849_SRR7890875_report.html)
 
 <details>
 <summary><strong>What is this sample?</strong></summary>
