@@ -4,7 +4,7 @@
 
 [![Build](https://github.com/AhmedHassan-bioinfo/OpenCare/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AhmedHassan-bioinfo/OpenCare/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18365283.svg)](https://doi.org/10.5281/zenodo.18365283)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18472250.svg)](https://doi.org/10.5281/zenodo.18472250)
 
 <p align="center">
   <img src="assets/OpenCare_Nlogo.jpg" alt="OpenCare Logo" width="550">
