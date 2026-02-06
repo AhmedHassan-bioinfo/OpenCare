@@ -19,7 +19,7 @@ This repository is aligned to the manuscript scope and wording.
 
 ---
 ## Workflow 
-<p align="center"> <img src="assets/OpenCare%20Workflow%20diagram.jpg" alt="OpenCare workflow diagram" width="900"> </p> 
+<p align="center"> <img src="assets/OpenCare%20Workflow%20diagram" alt="OpenCare workflow diagram" width="900"> </p> 
 ---
 ## Scope and intended use
 
