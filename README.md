@@ -27,11 +27,11 @@ This repository is aligned to the manuscript scope and wording.
 
 ---
 
-## Manuscript-aligned benchmarking summary
+## Benchmarking summary
 
-The manuscript benchmark uses comparator outputs and harmonized region restriction/normalization for fair cross-pipeline comparison.
 
-Key evaluation conditions (as reported in the manuscript and supplements):
+
+Key evaluation conditions :
 
 - callable loci defined from **samtools depth** with **DP ≥ 10 in both tumor and matched normal**
 - shared evaluation region: **HC ∩ capture targets ∩ callable**
