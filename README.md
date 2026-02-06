@@ -78,7 +78,7 @@ For complete evidence bundles, see the manuscript supplementary files (class-res
   https://ahmedhassan-bioinfo.github.io/OpenCare/OpenCare_Exome_Tumor_vs_Exome_Norm_report.html
 
 - Benchmark run report (SRR7890849/SRR7890875):  
-  https://ahmedhassan-bioinfo.github.io/OpenCare/SRR7890849_SRR7890875_report.html
+  [https://ahmedhassan-bioinfo.github.io/OpenCare/SRR7890849_SRR7890875_report.html](https://ahmedhassan-bioinfo.github.io/OpenCare/SRR7890849_SRR7890875_HTML_report.html)
 
 ---
 
