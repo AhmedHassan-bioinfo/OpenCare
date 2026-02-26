@@ -81,6 +81,8 @@ if( !params.containsKey('targets_bed') )            params.targets_bed       = n
 if( !params.containsKey('panel_name') )             params.panel_name        = null
 if( !params.containsKey('assay') )                  params.assay             = (params.panel_bed ? 'panel' : 'wgs')
 if( !params.containsKey('discard_trimmed_pass') )   params.discard_trimmed_pass = true
+if( !params.containsKey('publish_intermediates') ) params.publish_intermediates = false
+if( !params.containsKey('publish_fail_on_error') ) params.publish_fail_on_error = false
 
 /* --- report selection --- */
 params.empty_json = params.empty_json ?: "${baseDir}/.empty.json"
@@ -136,24 +138,30 @@ setDefaultPath('public_pon', [
 ], true)
 requireTabix('public_pon')
 
-/* ---- PoN selection: default to your real PoN, else fall back to public_pon ---- */
-def myPon = "${baseDir}/resources/pon/pon.vcf.gz"   // your real PoN
 
-// If user did NOT explicitly provide --pon_vcf, pick defaults:
-//   1) myPon if exists
-//   2) public_pon otherwise
-if( !params.pon_vcf || params.pon_vcf.toString().trim() == '' ) {
-  params.pon_vcf = file(myPon).exists() ? myPon : (params.public_pon ?: null)
+
+def defaultPon = "${projectDir}/resources/pon/pon.vcf.gz"
+
+def rawPon = (params.pon_vcf ?: '').toString().trim()
+if( !rawPon || rawPon.equalsIgnoreCase('null') || rawPon.equalsIgnoreCase('false') ) {
+    rawPon = defaultPon
+}
+
+def ponFile = file(rawPon)
+if( ponFile.exists() ) {
+    params.pon_vcf = ponFile.toString()
+    def tbi = file("${params.pon_vcf}.tbi")
+    def csi = file("${params.pon_vcf}.csi")
+    if( !(tbi.exists() || csi.exists()) ) {
+        error "PoN index missing for ${params.pon_vcf} (.tbi or .csi required)"
+    }
 } else {
-  // user provided --pon_vcf; keep it
-  params.pon_vcf = params.pon_vcf.toString()
+    log.warn "[PON] Not found at ${rawPon} -> PoN disabled"
+    params.pon_vcf = null
 }
 
-// sanity: require index if it's a bgzipped vcf
-if( params.pon_vcf && params.pon_vcf.toString().endsWith('.vcf.gz') ) {
-  def idx = "${params.pon_vcf}.tbi"
-  if( !file(idx).exists() ) error "Tabix index missing for pon_vcf: expected ${idx}"
-}
+log.info "[PON] final params.pon_vcf = ${params.pon_vcf ?: 'NONE'}"
+
 
 
 /* ---- other “always same” inputs you were passing (optional, no hard fail) ---- */
@@ -755,7 +763,11 @@ process SAMTOOLS_SORT_INDEX {
   memory { params.max_mem }
   time { params.max_time }
   stageInMode 'copy'
-  publishDir "${params.outdir}/align", mode: 'copy', overwrite: true
+  publishDir "${params.outdir}/align",
+  mode: 'copy',
+  overwrite: true,
+  enabled: params.publish_intermediates,   // default false => don't publish intermediate sorted CRAM
+  failOnError: params.publish_fail_on_error
   input:
     tuple val(sid), path(sam_gz)
     tuple path(ref_fa), path(ref_fai)
@@ -780,6 +792,7 @@ process MARKDUPS {
   memory '24 GB'
   time '8h'
   stageInMode 'copy'
+  publishDir "${params.outdir}/align", mode: 'copy', overwrite: true, failOnError: false
   input:
     tuple val(sid), path(cram), path(crai)
     tuple path(ref_fa), path(ref_fai)
@@ -919,7 +932,7 @@ process CALL_SOMATIC_MUTECT2 {
   container 'broadinstitute/gatk:4.5.0.0'
   cpus 6
   memory '16 GB'
-  time '12h'
+  time '72h'
   stageInMode 'copy'
   publishDir "${params.outdir}/vcf_somatic", mode: 'copy', overwrite: true
 
@@ -2183,15 +2196,6 @@ process MAKE_JSON_SUMMARY {
   time '6h'
   publishDir "${params.outdir}/json", mode: 'copy', overwrite: true
 
-  // env values as plain strings to keep Groovy happy
-  env 'REPORT_USE_CSQ', (params.report_use_csq ? '1' : '0')
-  env 'REPORT_CODING_ONLY',   (params.report_coding_only ? '1' : '0')
-  env 'REPORT_KEEP_IMPACT',   "${params.report_keep_impact ?: 'HIGH,MODERATE'}"
-  env 'REPORT_MAX_PER_GENE',  "${params.report_max_per_gene ?: 50}"
-  env 'REPORT_MAX_ROWS',      "${params.report_max_rows     ?: 100000}"
-  env 'REPORT_SEARCH_LIMIT',  "${params.report_search_limit ?: 500}"
-  env 'ENABLE_EVIDENCE',      (params.enable_evidence ? '1' : '0')
-  env 'ONCOKB_TOKEN',         "${params.oncokb_token ?: ''}"
 
   input:
     tuple val(sid), path(vep_vcf), path(pharmcat_json), path(panel_qc_json)
@@ -2205,7 +2209,15 @@ process MAKE_JSON_SUMMARY {
   shell:
   $/
   set -euo pipefail
-
+  
+  export REPORT_USE_CSQ='!{ params.report_use_csq ? "1" : "0" }'
+  export REPORT_CODING_ONLY='!{ params.report_coding_only ? "1" : "0" }'
+  export REPORT_KEEP_IMPACT='!{ params.report_keep_impact ?: "HIGH,MODERATE" }'
+  export REPORT_MAX_PER_GENE='!{ params.report_max_per_gene ?: 50 }'
+  export REPORT_MAX_ROWS='!{ params.report_max_rows ?: 100000 }'
+  export REPORT_SEARCH_LIMIT='!{ params.report_search_limit ?: 500 }'
+  export ENABLE_EVIDENCE='!{ params.enable_evidence ? "1" : "0" }'
+  export ONCOKB_TOKEN='!{ params.oncokb_token ?: "" }'
   # Normalize inputs to predictable names
   cp -f "!{vep_vcf}"       vcf_in
   cp -f "!{pharmcat_json}" pharmcat.json  2>/dev/null || :
