@@ -31,13 +31,11 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Extract Android project
+      - name: Extract and normalize Android project
         run: |
           rm -rf build-apk
           mkdir build-apk
           unzip -q memorize-quran-build/MemorizeQuran_APKSource_lite.zip -d build-apk
-          echo "Extracted files:"
-          find build-apk -maxdepth 4 -type f | sort | head -100
           SETTINGS="$(find build-apk -type f \( -name settings.gradle -o -name settings.gradle.kts \) | head -1)"
           if [ -n "$SETTINGS" ]; then
             PROJECT_DIR="$(dirname "$SETTINGS")"
@@ -46,9 +44,68 @@ jobs:
           fi
           test -n "$PROJECT_DIR"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+          cat > "$PROJECT_DIR/settings.gradle" <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = 'MemorizeQuran'
+          include ':app'
+          EOF
+
+          cat > "$PROJECT_DIR/build.gradle" <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.5.2' apply false
+          }
+          EOF
+
+          cat > "$PROJECT_DIR/app/build.gradle" <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+
+          android {
+              namespace 'com.memorizequran.app'
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId 'com.memorizequran.app'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 1
+                  versionName '1.0'
+              }
+
+              buildTypes {
+                  debug {
+                      minifyEnabled false
+                  }
+                  release {
+                      minifyEnabled false
+                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+                  }
+              }
+
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+          }
+          EOF
+          touch "$PROJECT_DIR/app/proguard-rules.pro"
           echo "Project dir: $PROJECT_DIR"
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          ls -la "$ANDROID_HOME/platforms" | tail -20 || true
+          find "$PROJECT_DIR/app/src/main" -maxdepth 5 -type f | sort | head -120
 
       - name: Build debug APK
         run: |
