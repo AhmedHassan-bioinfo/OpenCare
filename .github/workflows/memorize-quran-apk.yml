@@ -1,0 +1,69 @@
+name: Build Memorize Quran APK
+
+on:
+  push:
+    branches:
+      - memorize-quran-apk-build
+    paths:
+      - 'memorize-quran-build/**'
+      - '.github/workflows/memorize-quran-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Ensure Android SDK
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Extract Android project
+        run: |
+          rm -rf build-apk
+          mkdir build-apk
+          unzip -q memorize-quran-build/MemorizeQuran_APKSource_lite.zip -d build-apk
+          echo "Extracted files:"
+          find build-apk -maxdepth 3 -type f | sort | head -80
+          SETTINGS="$(find build-apk -type f \( -name settings.gradle -o -name settings.gradle.kts \) | head -1)"
+          if [ -n "$SETTINGS" ]; then
+            PROJECT_DIR="$(dirname "$SETTINGS")"
+          else
+            PROJECT_DIR="$(find build-apk -type f -name build.gradle -printf '%h\n' | while read d; do [ -d "$d/app" ] && echo "$d"; done | head -1)"
+          fi
+          test -n "$PROJECT_DIR"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Build debug APK
+        run: |
+          gradle --no-daemon -p "$PROJECT_DIR" assembleDebug
+          APK="$(find "$PROJECT_DIR/app/build/outputs/apk" -type f -name '*.apk' | head -1)"
+          test -f "$APK"
+          cp "$APK" "$GITHUB_WORKSPACE/MemorizeQuran.apk"
+          ls -lh "$GITHUB_WORKSPACE/MemorizeQuran.apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MemorizeQuran-APK
+          path: MemorizeQuran.apk
+          if-no-files-found: error
+          retention-days: 7
