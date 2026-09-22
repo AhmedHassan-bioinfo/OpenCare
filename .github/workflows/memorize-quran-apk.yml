@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -122,3 +122,13 @@ jobs:
           path: MemorizeQuran.apk
           if-no-files-found: error
           retention-days: 7
+
+      - name: Save APK on build branch
+        run: |
+          mkdir -p memorize-quran-build/output
+          cp MemorizeQuran.apk memorize-quran-build/output/MemorizeQuran.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f memorize-quran-build/output/MemorizeQuran.apk
+          git commit -m "Add built Memorize Quran APK [skip ci]" || exit 0
+          git push origin HEAD:memorize-quran-apk-build
