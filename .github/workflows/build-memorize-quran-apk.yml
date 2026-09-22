@@ -58,3 +58,5 @@ jobs:
           path: /tmp/Memorize-Quran.apk
           if-no-files-found: error
           retention-days: 7
+
+# rebuild after all source chunks uploaded
