@@ -1,0 +1,60 @@
+name: Build Memorize Quran APK
+
+on:
+  push:
+    branches:
+      - memorize-quran-apk-build
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Reconstruct source
+        shell: bash
+        run: |
+          cat memorize-quran-build/xz/p* > /tmp/mq.b64
+          base64 -d /tmp/mq.b64 > /tmp/mq.tar.xz
+          mkdir -p /tmp/mqsrc
+          tar -xJf /tmp/mq.tar.xz -C /tmp/mqsrc
+          test -f /tmp/mqsrc/mq_textonly/app/build.gradle
+
+      - name: Build APK
+        working-directory: /tmp/mqsrc/mq_textonly
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Prepare APK
+        run: |
+          cp /tmp/mqsrc/mq_textonly/app/build/outputs/apk/debug/app-debug.apk /tmp/Memorize-Quran.apk
+          ls -lh /tmp/Memorize-Quran.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Memorize-Quran-APK
+          path: /tmp/Memorize-Quran.apk
+          if-no-files-found: error
+          retention-days: 7
